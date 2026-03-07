@@ -93,14 +93,19 @@ const Login = () => {
 
           {/* Quick login */}
           <div className="mt-8 space-y-1">
-            {MOCK_USERS.map((user) => (
+            <p className="text-xs text-muted-foreground mb-2 text-center">Quick fill by role</p>
+            {MOCK_USERS.map((u) => (
               <button
-                key={user.id}
-                onClick={() => loginAs(user)}
+                key={u.id}
+                onClick={() => {
+                  setName(u.name);
+                  setEmail(u.email);
+                  setPassword('password123');
+                }}
                 className="w-full flex items-center justify-between px-4 py-3 rounded-md text-login-card-foreground hover:bg-secondary/10 transition-colors"
               >
-                <span className="font-medium text-sm">{user.name}</span>
-                <span className="text-xs text-primary">{ROLE_LABELS[user.role]}</span>
+                <span className="font-medium text-sm">{u.name}</span>
+                <span className="text-xs text-primary">{ROLE_LABELS[u.role]}</span>
               </button>
             ))}
           </div>

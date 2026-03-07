@@ -1,68 +1,356 @@
 import { useAuth } from '@/context/AuthContext';
 import { useCRM } from '@/context/CRMContext';
-import { ROLE_LABELS } from '@/types/crm';
+import { ROLE_LABELS, MOCK_USERS } from '@/types/crm';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Phone, FolderKanban, Users, TrendingUp, Clock, CheckCircle } from 'lucide-react';
+import { Phone, FolderKanban, Users, TrendingUp, Clock, CheckCircle, ArrowUpRight, ArrowDownRight, Activity, BarChart3, PieChart, Target, UserCheck, PhoneCall, CalendarCheck } from 'lucide-react';
 
-const Dashboard = () => {
-  const { user } = useAuth();
-  const { leads, projects } = useCRM();
+const AdminDashboard = ({ leads, projects, notifications }: { leads: any[]; projects: any[]; notifications: any[] }) => {
+  const converted = leads.filter(l => l.status === 'Converted').length;
+  const conversionRate = leads.length > 0 ? Math.round((converted / leads.length) * 100) : 0;
+  const assignedLeads = leads.filter(l => l.assignedTo).length;
+  const unassigned = leads.length - assignedLeads;
 
-  if (!user) return null;
+  const statCards = [
+    { label: 'Total Leads', value: leads.length, icon: Phone, change: '+12%', up: true },
+    { label: 'Active Projects', value: projects.filter(p => p.status !== 'Completed').length, icon: FolderKanban, change: '+3', up: true },
+    { label: 'Conversion Rate', value: `${conversionRate}%`, icon: TrendingUp, change: '+5%', up: true },
+    { label: 'Pending Follow-ups', value: leads.filter(l => l.status === 'Follow-up').length, icon: Clock, change: '-2', up: false },
+  ];
 
-  const stats = getStats(user.role, user.id, leads, projects);
+  const statusBreakdown = [
+    { status: 'New', count: leads.filter(l => l.status === 'New').length, color: 'bg-info' },
+    { status: 'Contacted', count: leads.filter(l => l.status === 'Contacted').length, color: 'bg-warning' },
+    { status: 'Interested', count: leads.filter(l => l.status === 'Interested').length, color: 'bg-primary' },
+    { status: 'Follow-up', count: leads.filter(l => l.status === 'Follow-up').length, color: 'bg-warning' },
+    { status: 'Converted', count: converted, color: 'bg-success' },
+    { status: 'Not Interested', count: leads.filter(l => l.status === 'Not Interested').length, color: 'bg-destructive' },
+  ];
 
   return (
-    <div className="space-y-8 animate-fade-in">
-      <div>
-        <h1 className="text-3xl font-bold">Welcome, {user.name}</h1>
-        <p className="text-muted-foreground mt-1">{ROLE_LABELS[user.role]} Dashboard</p>
-      </div>
-
+    <div className="space-y-6">
+      {/* Stat Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {stats.map((stat, i) => (
-          <Card key={i} className="bg-card border-border">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">{stat.label}</CardTitle>
-              <stat.icon className="h-4 w-4 text-primary" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold">{stat.value}</div>
+        {statCards.map((stat, i) => (
+          <Card key={i} className="bg-card border-border overflow-hidden">
+            <CardContent className="p-5">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-muted-foreground">{stat.label}</span>
+                <div className="h-9 w-9 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <stat.icon className="h-4 w-4 text-primary" />
+                </div>
+              </div>
+              <div className="mt-3 flex items-end gap-2">
+                <span className="text-3xl font-bold">{stat.value}</span>
+                <span className={`text-xs font-medium flex items-center ${stat.up ? 'text-success' : 'text-destructive'}`}>
+                  {stat.up ? <ArrowUpRight className="h-3 w-3" /> : <ArrowDownRight className="h-3 w-3" />}
+                  {stat.change}
+                </span>
+              </div>
             </CardContent>
           </Card>
         ))}
       </div>
 
-      {/* Recent leads table */}
-      <Card className="bg-card border-border">
-        <CardHeader>
-          <CardTitle>Recent Leads</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-border">
-                  <th className="text-left py-3 px-2 text-muted-foreground font-medium">Name</th>
-                  <th className="text-left py-3 px-2 text-muted-foreground font-medium">Company</th>
-                  <th className="text-left py-3 px-2 text-muted-foreground font-medium">Status</th>
-                  <th className="text-left py-3 px-2 text-muted-foreground font-medium">Date</th>
-                </tr>
-              </thead>
-              <tbody>
-                {leads.slice(0, 5).map((lead) => (
-                  <tr key={lead.id} className="border-b border-border/50">
-                    <td className="py-3 px-2 font-medium">{lead.name}</td>
-                    <td className="py-3 px-2 text-muted-foreground">{lead.company || '—'}</td>
-                    <td className="py-3 px-2">
-                      <StatusBadge status={lead.status} />
-                    </td>
-                    <td className="py-3 px-2 text-muted-foreground">{lead.createdAt}</td>
-                  </tr>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        {/* Lead Pipeline */}
+        <Card className="bg-card border-border lg:col-span-2">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg flex items-center gap-2"><BarChart3 className="h-4 w-4 text-primary" /> Lead Pipeline</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {statusBreakdown.map(s => (
+                <div key={s.status} className="flex items-center gap-3">
+                  <span className="text-sm text-muted-foreground w-28">{s.status}</span>
+                  <div className="flex-1 h-7 bg-secondary/30 rounded-full overflow-hidden">
+                    <div
+                      className={`h-full ${s.color} rounded-full flex items-center justify-end pr-2 transition-all`}
+                      style={{ width: leads.length > 0 ? `${Math.max((s.count / leads.length) * 100, 8)}%` : '8%' }}
+                    >
+                      <span className="text-xs font-bold text-background">{s.count}</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Team Overview */}
+        <Card className="bg-card border-border">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg flex items-center gap-2"><Users className="h-4 w-4 text-primary" /> Team Overview</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {MOCK_USERS.filter(u => u.role !== 'admin').map(member => {
+              const memberLeads = leads.filter(l => l.assignedTo === member.id);
+              const memberConverted = memberLeads.filter(l => l.status === 'Converted').length;
+              return (
+                <div key={member.id} className="flex items-center gap-3 p-3 rounded-lg bg-secondary/20">
+                  <div className="h-9 w-9 rounded-full bg-primary/20 flex items-center justify-center text-sm font-bold text-primary">
+                    {member.name.charAt(0)}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium truncate">{member.name}</p>
+                    <p className="text-xs text-muted-foreground">{ROLE_LABELS[member.role]}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm font-bold">{memberLeads.length}</p>
+                    <p className="text-xs text-muted-foreground">{memberConverted} conv.</p>
+                  </div>
+                </div>
+              );
+            })}
+            <div className="pt-2 border-t border-border flex justify-between text-sm">
+              <span className="text-muted-foreground">Unassigned</span>
+              <span className="font-bold text-warning">{unassigned}</span>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Recent Activity & Projects */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <Card className="bg-card border-border">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg flex items-center gap-2"><Activity className="h-4 w-4 text-primary" /> Recent Leads</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              {leads.slice(0, 5).map(lead => (
+                <div key={lead.id} className="flex items-center justify-between py-2 border-b border-border/30 last:border-0">
+                  <div>
+                    <p className="text-sm font-medium">{lead.name}</p>
+                    <p className="text-xs text-muted-foreground">{lead.company || 'No company'}</p>
+                  </div>
+                  <StatusBadge status={lead.status} />
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-card border-border">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg flex items-center gap-2"><FolderKanban className="h-4 w-4 text-primary" /> Active Projects</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {projects.length === 0 ? (
+              <p className="text-sm text-muted-foreground py-8 text-center">No projects yet. Convert leads to create projects.</p>
+            ) : (
+              <div className="space-y-2">
+                {projects.slice(0, 5).map(project => (
+                  <div key={project.id} className="flex items-center justify-between py-2 border-b border-border/30 last:border-0">
+                    <div>
+                      <p className="text-sm font-medium">{project.clientName}</p>
+                      <p className="text-xs text-muted-foreground">{project.clientEmail}</p>
+                    </div>
+                    <StatusBadge status={project.status} />
+                  </div>
                 ))}
-              </tbody>
-            </table>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+};
+
+const SalesManagerDashboard = ({ leads }: { leads: any[] }) => {
+  const assigned = leads.filter(l => l.assignedTo).length;
+  const converted = leads.filter(l => l.status === 'Converted').length;
+  const followUps = leads.filter(l => l.status === 'Follow-up').length;
+
+  return (
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        {[
+          { label: 'Total Leads', value: leads.length, icon: Phone },
+          { label: 'Assigned', value: assigned, icon: UserCheck },
+          { label: 'Converted', value: converted, icon: TrendingUp },
+          { label: 'Pending Follow-ups', value: followUps, icon: Clock },
+        ].map((s, i) => (
+          <Card key={i} className="bg-card border-border">
+            <CardContent className="p-5">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-muted-foreground">{s.label}</span>
+                <s.icon className="h-4 w-4 text-primary" />
+              </div>
+              <p className="text-3xl font-bold mt-2">{s.value}</p>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      {/* Telecaller Performance */}
+      <Card className="bg-card border-border">
+        <CardHeader><CardTitle className="flex items-center gap-2"><Target className="h-4 w-4 text-primary" /> Telecaller Performance</CardTitle></CardHeader>
+        <CardContent>
+          {MOCK_USERS.filter(u => u.role === 'telecaller').map(tc => {
+            const tcLeads = leads.filter(l => l.assignedTo === tc.id);
+            const tcConverted = tcLeads.filter(l => l.status === 'Converted').length;
+            const tcFollowUp = tcLeads.filter(l => l.status === 'Follow-up').length;
+            return (
+              <div key={tc.id} className="flex items-center gap-4 p-4 rounded-lg bg-secondary/20 mb-2">
+                <div className="h-10 w-10 rounded-full bg-primary/20 flex items-center justify-center font-bold text-primary">{tc.name.charAt(0)}</div>
+                <div className="flex-1">
+                  <p className="font-medium">{tc.name}</p>
+                  <p className="text-xs text-muted-foreground">{tcLeads.length} leads assigned</p>
+                </div>
+                <div className="grid grid-cols-2 gap-4 text-center">
+                  <div><p className="text-lg font-bold text-success">{tcConverted}</p><p className="text-xs text-muted-foreground">Converted</p></div>
+                  <div><p className="text-lg font-bold text-warning">{tcFollowUp}</p><p className="text-xs text-muted-foreground">Follow-ups</p></div>
+                </div>
+              </div>
+            );
+          })}
+        </CardContent>
+      </Card>
+
+      {/* Unassigned Leads */}
+      <Card className="bg-card border-border">
+        <CardHeader><CardTitle>Unassigned Leads</CardTitle></CardHeader>
+        <CardContent>
+          {leads.filter(l => !l.assignedTo).length === 0 ? (
+            <p className="text-sm text-muted-foreground text-center py-4">All leads are assigned</p>
+          ) : (
+            <div className="space-y-2">
+              {leads.filter(l => !l.assignedTo).slice(0, 5).map(lead => (
+                <div key={lead.id} className="flex items-center justify-between py-2 border-b border-border/30 last:border-0">
+                  <div>
+                    <p className="text-sm font-medium">{lead.name}</p>
+                    <p className="text-xs text-muted-foreground">{lead.company || '—'} · {lead.source || '—'}</p>
+                  </div>
+                  <StatusBadge status={lead.status} />
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
+
+const TelecallerDashboard = ({ leads, userId }: { leads: any[]; userId: string }) => {
+  const myLeads = leads.filter(l => l.assignedTo === userId);
+  const contacted = myLeads.filter(l => l.status === 'Contacted').length;
+  const followUps = myLeads.filter(l => l.status === 'Follow-up').length;
+  const converted = myLeads.filter(l => l.status === 'Converted').length;
+
+  return (
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        {[
+          { label: 'My Leads', value: myLeads.length, icon: Phone },
+          { label: 'Contacted', value: contacted, icon: PhoneCall },
+          { label: 'Follow-ups Due', value: followUps, icon: CalendarCheck },
+          { label: 'Converted', value: converted, icon: CheckCircle },
+        ].map((s, i) => (
+          <Card key={i} className="bg-card border-border">
+            <CardContent className="p-5">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-muted-foreground">{s.label}</span>
+                <s.icon className="h-4 w-4 text-primary" />
+              </div>
+              <p className="text-3xl font-bold mt-2">{s.value}</p>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      {/* Today's Tasks */}
+      <Card className="bg-card border-border">
+        <CardHeader><CardTitle className="flex items-center gap-2"><Clock className="h-4 w-4 text-primary" /> Upcoming Follow-ups</CardTitle></CardHeader>
+        <CardContent>
+          {myLeads.filter(l => l.followUpDate).length === 0 ? (
+            <p className="text-sm text-muted-foreground text-center py-4">No follow-ups scheduled</p>
+          ) : (
+            <div className="space-y-2">
+              {myLeads.filter(l => l.followUpDate).map(lead => (
+                <div key={lead.id} className="flex items-center justify-between p-3 rounded-lg bg-secondary/20">
+                  <div>
+                    <p className="text-sm font-medium">{lead.name}</p>
+                    <p className="text-xs text-muted-foreground">{lead.company || '—'}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm font-medium text-warning">{lead.followUpDate}</p>
+                    <StatusBadge status={lead.status} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* My Leads List */}
+      <Card className="bg-card border-border">
+        <CardHeader><CardTitle>My Leads</CardTitle></CardHeader>
+        <CardContent>
+          <div className="space-y-2">
+            {myLeads.slice(0, 6).map(lead => (
+              <div key={lead.id} className="flex items-center justify-between py-2 border-b border-border/30 last:border-0">
+                <div>
+                  <p className="text-sm font-medium">{lead.name}</p>
+                  <p className="text-xs text-muted-foreground">{lead.phone}</p>
+                </div>
+                <StatusBadge status={lead.status} />
+              </div>
+            ))}
+            {myLeads.length === 0 && <p className="text-sm text-muted-foreground text-center py-4">No leads assigned yet</p>}
           </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
+
+const TechLeadDashboard = ({ projects }: { projects: any[] }) => {
+  const active = projects.filter(p => p.status === 'In Progress').length;
+  const planning = projects.filter(p => p.status === 'Planning').length;
+  const completed = projects.filter(p => p.status === 'Completed').length;
+
+  return (
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        {[
+          { label: 'Total Projects', value: projects.length, icon: FolderKanban },
+          { label: 'In Progress', value: active, icon: Activity },
+          { label: 'Planning', value: planning, icon: Clock },
+          { label: 'Completed', value: completed, icon: CheckCircle },
+        ].map((s, i) => (
+          <Card key={i} className="bg-card border-border">
+            <CardContent className="p-5">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-muted-foreground">{s.label}</span>
+                <s.icon className="h-4 w-4 text-primary" />
+              </div>
+              <p className="text-3xl font-bold mt-2">{s.value}</p>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      <Card className="bg-card border-border">
+        <CardHeader><CardTitle className="flex items-center gap-2"><FolderKanban className="h-4 w-4 text-primary" /> All Projects</CardTitle></CardHeader>
+        <CardContent>
+          {projects.length === 0 ? (
+            <p className="text-sm text-muted-foreground text-center py-8">No projects yet. Projects are created when leads are converted.</p>
+          ) : (
+            <div className="space-y-2">
+              {projects.map(project => (
+                <div key={project.id} className="flex items-center justify-between p-3 rounded-lg bg-secondary/20">
+                  <div>
+                    <p className="text-sm font-medium">{project.clientName}</p>
+                    <p className="text-xs text-muted-foreground">{project.clientEmail} · {project.clientPhone}</p>
+                  </div>
+                  <StatusBadge status={project.status} />
+                </div>
+              ))}
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
@@ -77,6 +365,11 @@ const StatusBadge = ({ status }: { status: string }) => {
     'Interested': 'bg-primary/20 text-primary',
     'Not Interested': 'bg-destructive/20 text-destructive',
     'Converted': 'bg-success/20 text-success',
+    'Planning': 'bg-info/20 text-info',
+    'In Progress': 'bg-primary/20 text-primary',
+    'Review': 'bg-warning/20 text-warning',
+    'Completed': 'bg-success/20 text-success',
+    'On Hold': 'bg-muted text-muted-foreground',
   };
   return (
     <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${colors[status] || ''}`}>
@@ -85,40 +378,25 @@ const StatusBadge = ({ status }: { status: string }) => {
   );
 };
 
-function getStats(role: string, userId: string, leads: any[], projects: any[]) {
-  const myLeads = leads.filter(l => l.assignedTo === userId);
-  switch (role) {
-    case 'admin':
-      return [
-        { label: 'Total Leads', value: leads.length, icon: Phone },
-        { label: 'Projects', value: projects.length, icon: FolderKanban },
-        { label: 'Converted', value: leads.filter(l => l.status === 'Converted').length, icon: CheckCircle },
-        { label: 'Follow-ups', value: leads.filter(l => l.status === 'Follow-up').length, icon: Clock },
-      ];
-    case 'sales_manager':
-      return [
-        { label: 'Total Leads', value: leads.length, icon: Phone },
-        { label: 'Assigned', value: leads.filter(l => l.assignedTo).length, icon: Users },
-        { label: 'Converted', value: leads.filter(l => l.status === 'Converted').length, icon: TrendingUp },
-        { label: 'Pending Follow-ups', value: leads.filter(l => l.status === 'Follow-up').length, icon: Clock },
-      ];
-    case 'telecaller':
-      return [
-        { label: 'My Leads', value: myLeads.length, icon: Phone },
-        { label: 'Contacted', value: myLeads.filter(l => l.status === 'Contacted').length, icon: CheckCircle },
-        { label: 'Follow-ups', value: myLeads.filter(l => l.status === 'Follow-up').length, icon: Clock },
-        { label: 'Converted', value: myLeads.filter(l => l.status === 'Converted').length, icon: TrendingUp },
-      ];
-    case 'tech_lead':
-      return [
-        { label: 'Active Projects', value: projects.filter(p => p.status === 'In Progress').length, icon: FolderKanban },
-        { label: 'Planning', value: projects.filter(p => p.status === 'Planning').length, icon: Clock },
-        { label: 'Completed', value: projects.filter(p => p.status === 'Completed').length, icon: CheckCircle },
-        { label: 'Total Projects', value: projects.length, icon: TrendingUp },
-      ];
-    default:
-      return [];
-  }
-}
+const Dashboard = () => {
+  const { user } = useAuth();
+  const { leads, projects, notifications } = useCRM();
+
+  if (!user) return null;
+
+  return (
+    <div className="space-y-6 animate-fade-in">
+      <div>
+        <h1 className="text-3xl font-bold">Welcome, {user.name}</h1>
+        <p className="text-muted-foreground mt-1">{ROLE_LABELS[user.role]} Dashboard</p>
+      </div>
+
+      {user.role === 'admin' && <AdminDashboard leads={leads} projects={projects} notifications={notifications} />}
+      {user.role === 'sales_manager' && <SalesManagerDashboard leads={leads} />}
+      {user.role === 'telecaller' && <TelecallerDashboard leads={leads} userId={user.id} />}
+      {user.role === 'tech_lead' && <TechLeadDashboard projects={projects} />}
+    </div>
+  );
+};
 
 export default Dashboard;
