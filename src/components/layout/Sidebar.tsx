@@ -1,29 +1,37 @@
 import { useAuth } from '@/context/AuthContext';
+import { useTheme } from '@/context/ThemeContext';
 import { useCRM } from '@/context/CRMContext';
 import { ROLE_LABELS } from '@/types/crm';
 import { Link, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard, Users, FolderKanban, Bell, Trophy,
-  Settings, LogOut, Phone, UserCircle
+  Settings, LogOut, Phone, UserCircle, Moon, Sun
 } from 'lucide-react';
 
 const Sidebar = () => {
   const { user, logout } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const { getUnreadCount } = useCRM();
   const location = useLocation();
 
   if (!user) return null;
 
   const unread = getUnreadCount(user.id);
-
   const navItems = getNavItems(user.role);
 
   return (
     <aside className="w-64 min-h-screen bg-sidebar flex flex-col border-r border-sidebar-border">
-      <div className="p-6">
+      <div className="p-6 flex items-center justify-between">
         <h1 className="text-xl font-bold text-sidebar-foreground">
           X Enterprise <span className="text-sidebar-primary">CRM</span>
         </h1>
+        <button
+          onClick={toggleTheme}
+          className="p-2 rounded-md text-sidebar-foreground hover:bg-sidebar-accent transition-colors"
+          aria-label="Toggle theme"
+        >
+          {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+        </button>
       </div>
 
       <nav className="flex-1 px-3 space-y-1">
