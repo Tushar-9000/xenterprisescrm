@@ -5,7 +5,7 @@ import { MOCK_USERS, ROLE_LABELS, UserRole } from '@/types/crm';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { Moon, Sun, BarChart3, Users, FolderOpen, TrendingUp } from 'lucide-react';
+import { Moon, Sun, BarChart3, Users, FolderOpen, TrendingUp, Eye, EyeOff } from 'lucide-react';
 
 const ROLE_ORDER: UserRole[] = ['admin', 'tech_lead', 'sales_manager', 'telecaller'];
 

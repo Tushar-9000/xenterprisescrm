@@ -9,6 +9,7 @@ export interface User {
   dob?: string;
   address?: string;
   profilePic?: string;
+  password?: string;
   role: UserRole;
   avatar?: string;
   joiningDate?: string;
