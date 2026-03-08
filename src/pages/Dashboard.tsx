@@ -1,24 +1,10 @@
-import { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useCRM } from '@/context/CRMContext';
 import { ROLE_LABELS, MOCK_USERS } from '@/types/crm';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-import { toast } from 'sonner';
-import { Phone, FolderKanban, Users, TrendingUp, Clock, CheckCircle, ArrowUpRight, ArrowDownRight, Activity, BarChart3, Target, UserCheck, PhoneCall, CalendarCheck, Plus, Trash2, Pencil, Code2 } from 'lucide-react';
+import { Phone, FolderKanban, Users, TrendingUp, Clock, CheckCircle, ArrowUpRight, ArrowDownRight, Activity, BarChart3, Target, UserCheck, PhoneCall, CalendarCheck } from 'lucide-react';
 
 const AdminDashboard = ({ leads, projects, notifications }: { leads: any[]; projects: any[]; notifications: any[] }) => {
-  const { developers, addDeveloper, removeDeveloper, updateDeveloper, assignDeveloper } = useCRM();
-  const [newDevName, setNewDevName] = useState('');
-  const [addDevOpen, setAddDevOpen] = useState(false);
-  const [editDevId, setEditDevId] = useState<string | null>(null);
-  const [editDevName, setEditDevName] = useState('');
-  const [reassignOpen, setReassignOpen] = useState<string | null>(null);
-
   const converted = leads.filter(l => l.status === 'Converted').length;
   const conversionRate = leads.length > 0 ? Math.round((converted / leads.length) * 100) : 0;
   const assignedLeads = leads.filter(l => l.assignedTo).length;
@@ -40,32 +26,6 @@ const AdminDashboard = ({ leads, projects, notifications }: { leads: any[]; proj
     { status: 'Not Interested', count: leads.filter(l => l.status === 'Not Interested').length, color: 'bg-destructive' },
   ];
 
-  const handleAddDev = () => {
-    if (!newDevName.trim()) return;
-    addDeveloper(newDevName.trim());
-    setNewDevName('');
-    setAddDevOpen(false);
-    toast.success('Developer added');
-  };
-
-  const handleEditDev = () => {
-    if (!editDevId || !editDevName.trim()) return;
-    updateDeveloper(editDevId, editDevName.trim());
-    setEditDevId(null);
-    setEditDevName('');
-    toast.success('Developer updated');
-  };
-
-  const handleRemoveDev = (id: string) => {
-    removeDeveloper(id);
-    toast.success('Developer removed');
-  };
-
-  const handleReassign = (projectId: string, devId: string) => {
-    assignDeveloper(projectId, devId);
-    setReassignOpen(null);
-    toast.success('Project reassigned');
-  };
 
   return (
     <div className="space-y-6">
@@ -150,103 +110,6 @@ const AdminDashboard = ({ leads, projects, notifications }: { leads: any[]; proj
         </Card>
       </div>
 
-      {/* Developer Management */}
-      <Card className="bg-card border-border">
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="text-lg flex items-center gap-2"><Code2 className="h-4 w-4 text-primary" /> Developer Management</CardTitle>
-          <Dialog open={addDevOpen} onOpenChange={setAddDevOpen}>
-            <DialogTrigger asChild>
-              <Button size="sm" className="gap-1"><Plus className="h-3.5 w-3.5" /> Add Developer</Button>
-            </DialogTrigger>
-            <DialogContent className="bg-card border-border">
-              <DialogHeader><DialogTitle>Add Developer</DialogTitle></DialogHeader>
-              <Input placeholder="Developer Name" value={newDevName} onChange={e => setNewDevName(e.target.value)} />
-              <Button onClick={handleAddDev}>Add</Button>
-            </DialogContent>
-          </Dialog>
-        </CardHeader>
-        <CardContent>
-          {developers.length === 0 ? (
-            <p className="text-sm text-muted-foreground text-center py-4">No developers added yet</p>
-          ) : (
-            <div className="space-y-2">
-              {developers.map(dev => {
-                const devProjects = projects.filter(p => p.assignedDeveloper === dev.id);
-                return (
-                  <div key={dev.id} className="flex items-center gap-3 p-3 rounded-lg bg-secondary/20">
-                    <div className="h-9 w-9 rounded-full bg-primary/20 flex items-center justify-center text-sm font-bold text-primary">
-                      {dev.name.charAt(0)}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium">{dev.name}</p>
-                      <p className="text-xs text-muted-foreground">{devProjects.length} project{devProjects.length !== 1 ? 's' : ''} assigned</p>
-                      {devProjects.length > 0 && (
-                        <div className="flex flex-wrap gap-1 mt-1">
-                          {devProjects.map(p => (
-                            <span key={p.id} className="inline-flex items-center gap-1 text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">
-                              {p.name}
-                              {/* Reassign button */}
-                              <Dialog open={reassignOpen === p.id} onOpenChange={(o) => setReassignOpen(o ? p.id : null)}>
-                                <DialogTrigger asChild>
-                                  <button className="hover:text-primary/70 ml-0.5"><Pencil className="h-2.5 w-2.5" /></button>
-                                </DialogTrigger>
-                                <DialogContent className="bg-card border-border">
-                                  <DialogHeader><DialogTitle>Reassign "{p.name}"</DialogTitle></DialogHeader>
-                                  <Select onValueChange={(v) => handleReassign(p.id, v)}>
-                                    <SelectTrigger className="bg-secondary border-border">
-                                      <SelectValue placeholder="Select developer" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      {developers.filter(d => d.id !== dev.id).map(d => (
-                                        <SelectItem key={d.id} value={d.id}>{d.name}</SelectItem>
-                                      ))}
-                                    </SelectContent>
-                                  </Select>
-                                </DialogContent>
-                              </Dialog>
-                            </span>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                    <div className="flex items-center gap-1">
-                      {/* Edit */}
-                      <Dialog open={editDevId === dev.id} onOpenChange={(o) => { setEditDevId(o ? dev.id : null); if (o) setEditDevName(dev.name); }}>
-                        <DialogTrigger asChild>
-                          <Button size="icon" variant="ghost" className="h-8 w-8"><Pencil className="h-3.5 w-3.5" /></Button>
-                        </DialogTrigger>
-                        <DialogContent className="bg-card border-border">
-                          <DialogHeader><DialogTitle>Edit Developer</DialogTitle></DialogHeader>
-                          <Input value={editDevName} onChange={e => setEditDevName(e.target.value)} />
-                          <Button onClick={handleEditDev}>Save</Button>
-                        </DialogContent>
-                      </Dialog>
-                      {/* Remove */}
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <Button size="icon" variant="ghost" className="h-8 w-8 text-destructive hover:text-destructive"><Trash2 className="h-3.5 w-3.5" /></Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent className="bg-card border-border">
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>Remove Developer</AlertDialogTitle>
-                            <AlertDialogDescription>Remove {dev.name}? They will be unassigned from all projects.</AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction onClick={() => handleRemoveDev(dev.id)}>Remove</AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Recent Activity & Projects */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <Card className="bg-card border-border">
           <CardHeader className="pb-3">

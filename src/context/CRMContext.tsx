@@ -1,11 +1,18 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
-import { Lead, Project, Notification, Note, LeadStatus, ProjectStatus, Developer, MOCK_DEVELOPERS } from '@/types/crm';
+import { Lead, Project, Notification, Note, LeadStatus, ProjectStatus, Developer, LeadFolder, User, MOCK_DEVELOPERS, MOCK_USERS } from '@/types/crm';
 
 interface CRMContextType {
   leads: Lead[];
   projects: Project[];
   notifications: Notification[];
+  folders: LeadFolder[];
+  users: User[];
+  addFolder: (name: string, location: string) => void;
+  deleteFolder: (folderId: string) => void;
+  renameFolder: (folderId: string, name: string) => void;
   addLead: (lead: Omit<Lead, 'id' | 'notes' | 'createdAt' | 'updatedAt'>) => void;
+  updateLead: (leadId: string, data: Partial<Pick<Lead, 'name' | 'email' | 'phone' | 'company' | 'source'>>) => void;
+  deleteLead: (leadId: string) => void;
   updateLeadStatus: (leadId: string, status: LeadStatus, userId: string) => void;
   assignLead: (leadId: string, userId: string) => void;
   addLeadNote: (leadId: string, note: Omit<Note, 'id' | 'createdAt'>) => void;
@@ -20,6 +27,9 @@ interface CRMContextType {
   addDeveloper: (name: string) => void;
   removeDeveloper: (id: string) => void;
   updateDeveloper: (id: string, name: string) => void;
+  addUser: (user: Omit<User, 'id'>) => void;
+  removeUser: (userId: string) => void;
+  updateUser: (userId: string, data: Partial<User>) => void;
   markNotificationRead: (notificationId: string) => void;
   getUnreadCount: (userId: string) => number;
 }
@@ -44,14 +54,39 @@ export const CRMProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [projects, setProjects] = useState<Project[]>([]);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [developers, setDevelopers] = useState<Developer[]>(MOCK_DEVELOPERS);
+  const [folders, setFolders] = useState<LeadFolder[]>([]);
+  const [users, setUsers] = useState<User[]>(MOCK_USERS);
 
   const addNotification = (n: Omit<Notification, 'id' | 'read' | 'createdAt'>) => {
     setNotifications(prev => [...prev, { ...n, id: `notif-${Date.now()}`, read: false, createdAt: new Date().toISOString() }]);
   };
 
+  // Folder CRUD
+  const addFolder = useCallback((name: string, location: string) => {
+    setFolders(prev => [...prev, { id: `f-${Date.now()}`, name, location, createdAt: new Date().toISOString() }]);
+  }, []);
+
+  const deleteFolder = useCallback((folderId: string) => {
+    setFolders(prev => prev.filter(f => f.id !== folderId));
+    setLeads(prev => prev.filter(l => l.folderId !== folderId));
+  }, []);
+
+  const renameFolder = useCallback((folderId: string, name: string) => {
+    setFolders(prev => prev.map(f => f.id === folderId ? { ...f, name } : f));
+  }, []);
+
+  // Lead CRUD
   const addLead = useCallback((lead: Omit<Lead, 'id' | 'notes' | 'createdAt' | 'updatedAt'>) => {
     const now = new Date().toISOString();
     setLeads(prev => [...prev, { ...lead, id: `l-${Date.now()}`, notes: [], createdAt: now, updatedAt: now }]);
+  }, []);
+
+  const updateLead = useCallback((leadId: string, data: Partial<Pick<Lead, 'name' | 'email' | 'phone' | 'company' | 'source'>>) => {
+    setLeads(prev => prev.map(l => l.id === leadId ? { ...l, ...data, updatedAt: new Date().toISOString() } : l));
+  }, []);
+
+  const deleteLead = useCallback((leadId: string) => {
+    setLeads(prev => prev.filter(l => l.id !== leadId));
   }, []);
 
   const updateLeadStatus = useCallback((leadId: string, status: LeadStatus, userId: string) => {
@@ -67,7 +102,7 @@ export const CRMProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           clientEmail: l.email,
           clientPhone: l.phone,
           status: 'Planning',
-          assignedTo: '2', // Tech Lead
+          assignedTo: '2',
           notes: l.notes,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
@@ -124,12 +159,24 @@ export const CRMProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const removeDeveloper = useCallback((id: string) => {
     setDevelopers(prev => prev.filter(d => d.id !== id));
-    // Unassign from projects
     setProjects(prev => prev.map(p => p.assignedDeveloper === id ? { ...p, assignedDeveloper: undefined } : p));
   }, []);
 
   const updateDeveloper = useCallback((id: string, name: string) => {
     setDevelopers(prev => prev.map(d => d.id === id ? { ...d, name } : d));
+  }, []);
+
+  // User CRUD
+  const addUser = useCallback((user: Omit<User, 'id'>) => {
+    setUsers(prev => [...prev, { ...user, id: `u-${Date.now()}` }]);
+  }, []);
+
+  const removeUser = useCallback((userId: string) => {
+    setUsers(prev => prev.filter(u => u.id !== userId));
+  }, []);
+
+  const updateUser = useCallback((userId: string, data: Partial<User>) => {
+    setUsers(prev => prev.map(u => u.id === userId ? { ...u, ...data } : u));
   }, []);
 
   const markNotificationRead = useCallback((notificationId: string) => {
@@ -141,7 +188,15 @@ export const CRMProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   }, [notifications]);
 
   return (
-    <CRMContext.Provider value={{ leads, projects, notifications, addLead, updateLeadStatus, assignLead, addLeadNote, addProject, deleteProject, updateProjectStatus, renameProject, setProjectDeadline, addProjectNote, assignDeveloper, markNotificationRead, getUnreadCount, developers, addDeveloper, removeDeveloper, updateDeveloper }}>
+    <CRMContext.Provider value={{
+      leads, projects, notifications, folders, users,
+      addFolder, deleteFolder, renameFolder,
+      addLead, updateLead, deleteLead, updateLeadStatus, assignLead, addLeadNote,
+      addProject, deleteProject, updateProjectStatus, renameProject, setProjectDeadline, addProjectNote, assignDeveloper,
+      markNotificationRead, getUnreadCount,
+      developers, addDeveloper, removeDeveloper, updateDeveloper,
+      addUser, removeUser, updateUser,
+    }}>
       {children}
     </CRMContext.Provider>
   );

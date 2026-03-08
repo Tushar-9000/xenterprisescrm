@@ -4,8 +4,10 @@ export interface User {
   id: string;
   name: string;
   email: string;
+  phone?: string;
   role: UserRole;
   avatar?: string;
+  joiningDate?: string;
 }
 
 export type LeadStatus = 'New' | 'Contacted' | 'Follow-up' | 'Interested' | 'Not Interested' | 'Converted';
@@ -21,8 +23,16 @@ export interface Lead {
   source?: string;
   notes: Note[];
   followUpDate?: string;
+  folderId?: string;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface LeadFolder {
+  id: string;
+  name: string;
+  location: string;
+  createdAt: string;
 }
 
 export interface Note {
@@ -68,10 +78,10 @@ export const ROLE_LABELS: Record<UserRole, string> = {
 };
 
 export const MOCK_USERS: User[] = [
-  { id: '1', name: 'Admin', email: 'admin@enterprisecrm.com', role: 'admin' },
-  { id: '2', name: 'Tushar', email: 'tushar@enterprisecrm.com', role: 'tech_lead' },
-  { id: '3', name: 'Vansh', email: 'vansh@enterprisecrm.com', role: 'sales_manager' },
-  { id: '4', name: 'Akanksha', email: 'akanksha@enterprisecrm.com', role: 'telecaller' },
+  { id: '1', name: 'Admin', email: 'admin@enterprisecrm.com', phone: '+919000000001', role: 'admin', joiningDate: '2025-01-01' },
+  { id: '2', name: 'Tushar', email: 'tushar@enterprisecrm.com', phone: '+919000000002', role: 'tech_lead', joiningDate: '2025-02-15' },
+  { id: '3', name: 'Vansh', email: 'vansh@enterprisecrm.com', phone: '+919000000003', role: 'sales_manager', joiningDate: '2025-03-01' },
+  { id: '4', name: 'Akanksha', email: 'akanksha@enterprisecrm.com', phone: '+919000000004', role: 'telecaller', joiningDate: '2025-04-10' },
 ];
 
 export interface Developer {

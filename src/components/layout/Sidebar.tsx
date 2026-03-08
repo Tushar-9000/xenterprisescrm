@@ -81,6 +81,7 @@ function getNavItems(role: string) {
       return [...common,
         { path: '/leads', label: 'All Leads', icon: Phone },
         { path: '/projects', label: 'Projects', icon: FolderKanban },
+        { path: '/developers', label: 'Developers', icon: UserCircle },
         { path: '/users', label: 'User Management', icon: Users },
         { path: '/notifications', label: 'Notifications', icon: Bell },
         { path: '/settings', label: 'Settings', icon: Settings },
