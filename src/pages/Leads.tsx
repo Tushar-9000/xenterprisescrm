@@ -66,7 +66,7 @@ const Leads = () => {
               <p className="text-muted-foreground text-sm">{tcFolderLeads.length} leads assigned</p>
             </div>
           </div>
-          <LeadTable leads={tcFolderLeads} user={user} isManager={false} isTelecaller={true} />
+          <LeadTable leads={tcFolderLeads} user={user} isManager={false} isTelecaller={true} onConvert={(lead) => { setConvertLead(lead); setProjectDetails({ projectName: `${lead.name} Project`, description: '' }); }} />
         </div>
       );
     }
