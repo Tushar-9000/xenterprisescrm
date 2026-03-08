@@ -258,11 +258,16 @@ export const CRMProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const addUser = useCallback((user: Omit<User, 'id'>) => {
     setUsers(prev => [...prev, { ...user, id: `u-${Date.now()}` }]);
-  }, []);
+    addActivity('user_added', 'User Added', `New user "${user.name}" (${user.role}) added`);
+    notifyByRole(['admin'], 'New User Added', `"${user.name}" joined as ${user.role}`);
+  }, [users]);
 
   const removeUser = useCallback((userId: string) => {
+    const removed = users.find(u => u.id === userId);
     setUsers(prev => prev.filter(u => u.id !== userId));
-  }, []);
+    addActivity('user_removed', 'User Removed', `User "${removed?.name || userId}" removed`);
+    notifyByRole(['admin'], 'User Removed', `"${removed?.name || userId}" was removed`);
+  }, [users]);
 
   const updateUser = useCallback((userId: string, data: Partial<User>) => {
     setUsers(prev => prev.map(u => u.id === userId ? { ...u, ...data } : u));
