@@ -106,7 +106,7 @@ const UserManagement = () => {
                           <div className="space-y-3">
                             <Input placeholder="Full Name" value={editData.name} onChange={e => setEditData(p => ({ ...p, name: e.target.value }))} />
                             <Input placeholder="Email" type="email" value={editData.email} onChange={e => setEditData(p => ({ ...p, email: e.target.value }))} />
-                            <Input placeholder="Phone" value={editData.phone} onChange={e => setEditData(p => ({ ...p, phone: e.target.value }))} />
+                            <Input placeholder="Phone" value={editData.phone} onChange={e => setEditData(p => ({ ...p, phone: sanitizePhone(e.target.value) }))} />
                             <Select value={editData.role} onValueChange={(v) => setEditData(p => ({ ...p, role: v as UserRole }))}>
                               <SelectTrigger className="bg-secondary border-border"><SelectValue /></SelectTrigger>
                               <SelectContent>
