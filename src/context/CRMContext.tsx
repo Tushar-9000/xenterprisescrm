@@ -9,8 +9,11 @@ interface CRMContextType {
   updateLeadStatus: (leadId: string, status: LeadStatus, userId: string) => void;
   assignLead: (leadId: string, userId: string) => void;
   addLeadNote: (leadId: string, note: Omit<Note, 'id' | 'createdAt'>) => void;
+  addProject: (project: Omit<Project, 'id' | 'notes' | 'createdAt' | 'updatedAt'>) => void;
+  deleteProject: (projectId: string) => void;
   updateProjectStatus: (projectId: string, status: ProjectStatus) => void;
   addProjectNote: (projectId: string, note: Omit<Note, 'id' | 'createdAt'>) => void;
+  assignDeveloper: (projectId: string, developerId: string) => void;
   markNotificationRead: (notificationId: string) => void;
   getUnreadCount: (userId: string) => number;
 }
@@ -78,12 +81,25 @@ export const CRMProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setLeads(prev => prev.map(l => l.id === leadId ? { ...l, notes: [...l.notes, { ...note, id: `n-${Date.now()}`, createdAt: new Date().toISOString() }], updatedAt: new Date().toISOString() } : l));
   }, []);
 
+  const addProject = useCallback((project: Omit<Project, 'id' | 'notes' | 'createdAt' | 'updatedAt'>) => {
+    const now = new Date().toISOString();
+    setProjects(prev => [...prev, { ...project, id: `p-${Date.now()}`, notes: [], createdAt: now, updatedAt: now }]);
+  }, []);
+
+  const deleteProject = useCallback((projectId: string) => {
+    setProjects(prev => prev.filter(p => p.id !== projectId));
+  }, []);
+
   const updateProjectStatus = useCallback((projectId: string, status: ProjectStatus) => {
     setProjects(prev => prev.map(p => p.id === projectId ? { ...p, status, updatedAt: new Date().toISOString() } : p));
   }, []);
 
   const addProjectNote = useCallback((projectId: string, note: Omit<Note, 'id' | 'createdAt'>) => {
     setProjects(prev => prev.map(p => p.id === projectId ? { ...p, notes: [...p.notes, { ...note, id: `n-${Date.now()}`, createdAt: new Date().toISOString() }], updatedAt: new Date().toISOString() } : p));
+  }, []);
+
+  const assignDeveloper = useCallback((projectId: string, developerId: string) => {
+    setProjects(prev => prev.map(p => p.id === projectId ? { ...p, assignedDeveloper: developerId, updatedAt: new Date().toISOString() } : p));
   }, []);
 
   const markNotificationRead = useCallback((notificationId: string) => {
@@ -95,7 +111,7 @@ export const CRMProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   }, [notifications]);
 
   return (
-    <CRMContext.Provider value={{ leads, projects, notifications, addLead, updateLeadStatus, assignLead, addLeadNote, updateProjectStatus, addProjectNote, markNotificationRead, getUnreadCount }}>
+    <CRMContext.Provider value={{ leads, projects, notifications, addLead, updateLeadStatus, assignLead, addLeadNote, addProject, deleteProject, updateProjectStatus, addProjectNote, assignDeveloper, markNotificationRead, getUnreadCount }}>
       {children}
     </CRMContext.Provider>
   );
