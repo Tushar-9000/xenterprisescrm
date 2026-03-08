@@ -60,13 +60,22 @@ const Sidebar = () => {
       </nav>
 
       <div className="p-4 border-t border-sidebar-border">
-        <div className="flex items-center gap-3 px-3 py-2">
-          <UserCircle className="h-8 w-8 text-sidebar-foreground" />
+        <Link
+          to="/profile"
+          className={`flex items-center gap-3 px-3 py-2 rounded-md transition-colors ${
+            location.pathname === '/profile' ? 'bg-sidebar-accent' : 'hover:bg-sidebar-accent'
+          }`}
+        >
+          {user.profilePic ? (
+            <img src={user.profilePic} alt={user.name} className="h-8 w-8 rounded-full object-cover" />
+          ) : (
+            <UserCircle className="h-8 w-8 text-sidebar-foreground" />
+          )}
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium text-sidebar-foreground truncate">{user.name}</p>
             <p className="text-xs text-primary">{ROLE_LABELS[user.role]}</p>
           </div>
-        </div>
+        </Link>
         <button
           onClick={logout}
           className="mt-2 flex items-center gap-3 px-3 py-2 w-full rounded-md text-sm text-sidebar-foreground hover:bg-sidebar-accent transition-colors"
