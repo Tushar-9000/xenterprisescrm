@@ -5,24 +5,15 @@ import { MOCK_USERS, ROLE_LABELS, UserRole } from '@/types/crm';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { Moon, Sun, ShieldCheck, BarChart3, Users, Zap, FolderOpen, Bell, Building2, TrendingUp, ClipboardList, Target } from 'lucide-react';
+import { Moon, Sun, BarChart3, Users, FolderOpen, TrendingUp } from 'lucide-react';
 
 const ROLE_ORDER: UserRole[] = ['admin', 'tech_lead', 'sales_manager', 'telecaller'];
 
-const FEATURES = [
-  { icon: ShieldCheck, title: 'Role-Based Access', desc: 'Admin, Tech Lead, Sales Manager & Telecaller — each with tailored dashboards' },
-  { icon: BarChart3, title: 'Lead Pipeline', desc: 'Track leads from creation to conversion with real-time status updates' },
-  { icon: Users, title: 'Team Management', desc: 'Manage developers, assign tasks, and monitor team performance' },
-  { icon: Zap, title: 'Real-time Activities', desc: 'Live activity feed to monitor all company operations instantly' },
-  { icon: FolderOpen, title: 'Folder Organization', desc: 'Leads organized in folders by project for structured telecalling' },
-  { icon: Bell, title: 'Smart Notifications', desc: 'Stay updated with role-specific alerts and task reminders' },
-];
-
-const WHAT_WE_DO = [
-  { icon: Building2, text: 'End-to-end real estate CRM for managing projects, leads, and sales teams' },
-  { icon: Target, text: 'Automated lead assignment and follow-up tracking across your workforce' },
-  { icon: TrendingUp, text: 'Performance leaderboards and analytics to drive team productivity' },
-  { icon: ClipboardList, text: 'Project-wise lead segregation with developer and sales manager coordination' },
+const HIGHLIGHTS = [
+  { icon: BarChart3, text: 'Lead pipeline & tracking' },
+  { icon: Users, text: 'Role-based team management' },
+  { icon: FolderOpen, text: 'Project-wise lead folders' },
+  { icon: TrendingUp, text: 'Performance analytics' },
 ];
 
 const Login = () => {
@@ -51,50 +42,26 @@ const Login = () => {
       </button>
 
       {/* Left side - Branding */}
-      <div className="hidden lg:flex lg:flex-1 flex-col justify-center px-16 bg-background overflow-y-auto py-12">
-        <div className="animate-fade-in max-w-xl">
+      <div className="hidden lg:flex lg:flex-1 flex-col justify-center px-16 bg-background">
+        <div className="animate-fade-in max-w-md">
           <h1 className="text-5xl font-extrabold tracking-tight mb-3">
             X Enterprise <span className="text-primary">CRM</span>
           </h1>
-          <p className="text-muted-foreground text-lg mb-8">
-            Powerful customer relationship management for modern real estate teams.
+          <p className="text-muted-foreground text-lg mb-10">
+            Real estate CRM for modern teams.
           </p>
 
-          {/* What We Do */}
-          <div className="mb-8 rounded-xl border border-border bg-card/50 p-5">
-            <h3 className="text-sm font-semibold text-foreground uppercase tracking-wider mb-4">What Our Platform Does</h3>
-            <div className="space-y-3">
-              {WHAT_WE_DO.map((item) => (
-                <div key={item.text} className="flex items-start gap-3">
-                  <div className="rounded-md bg-primary/10 p-1.5 mt-0.5">
-                    <item.icon className="h-3.5 w-3.5 text-primary" />
-                  </div>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{item.text}</p>
+          <div className="space-y-4 mb-10">
+            {HIGHLIGHTS.map((h) => (
+              <div key={h.text} className="flex items-center gap-3">
+                <div className="rounded-md bg-primary/10 p-2">
+                  <h.icon className="h-4 w-4 text-primary" />
                 </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Feature highlights */}
-          <h3 className="text-sm font-semibold text-foreground uppercase tracking-wider mb-3">Key Features</h3>
-          <div className="grid grid-cols-2 gap-3 mb-8">
-            {FEATURES.map((f) => (
-              <div
-                key={f.title}
-                className="flex items-start gap-3 rounded-lg border border-border bg-card p-4 transition-colors hover:border-primary/40"
-              >
-                <div className="rounded-md bg-primary/10 p-2 shrink-0">
-                  <f.icon className="h-4 w-4 text-primary" />
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-foreground">{f.title}</p>
-                  <p className="text-xs text-muted-foreground leading-relaxed">{f.desc}</p>
-                </div>
+                <p className="text-sm text-foreground">{h.text}</p>
               </div>
             ))}
           </div>
 
-          {/* Role chips */}
           <div className="flex flex-wrap gap-2">
             <span className="text-xs text-muted-foreground mr-1 self-center">Built for:</span>
             {ROLE_ORDER.map((role) => (
