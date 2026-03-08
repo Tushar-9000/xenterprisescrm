@@ -9,13 +9,14 @@ import {
 } from 'lucide-react';
 
 const Sidebar = () => {
-  const { user, logout } = useAuth();
+  const { user: authUser, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
-  const { getUnreadCount } = useCRM();
+  const { getUnreadCount, users } = useCRM();
   const location = useLocation();
 
-  if (!user) return null;
+  if (!authUser) return null;
 
+  const user = users.find(u => u.id === authUser.id) || authUser;
   const unread = getUnreadCount(user.id);
   const navItems = getNavItems(user.role);
 
