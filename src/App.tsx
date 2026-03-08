@@ -40,6 +40,7 @@ const AppRoutes = () => {
         <Route path="/notifications" element={<Notifications />} />
         <Route path="/leaderboard" element={<Leaderboard />} />
         <Route path="/developers" element={<DeveloperManagement />} />
+        <Route path="/lead-status" element={<LeadStatus />} />
         <Route path="/users" element={<UserManagement />} />
         <Route path="/settings" element={<SettingsPage />} />
       </Route>
