@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
-import { Lead, Project, Notification, Note, LeadStatus, ProjectStatus, Developer, LeadFolder, User, Activity, MOCK_DEVELOPERS, MOCK_USERS } from '@/types/crm';
+import { Lead, Project, Notification, Note, LeadStatus, ProjectStatus, Developer, LeadFolder, User, Activity, ProjectRequest, MOCK_USERS } from '@/types/crm';
 
 interface CRMContextType {
   leads: Lead[];
@@ -8,6 +8,7 @@ interface CRMContextType {
   notifications: Notification[];
   folders: LeadFolder[];
   users: User[];
+  projectRequests: ProjectRequest[];
   addFolder: (name: string, location: string) => void;
   deleteFolder: (folderId: string) => void;
   renameFolder: (folderId: string, name: string) => void;
@@ -33,6 +34,9 @@ interface CRMContextType {
   updateUser: (userId: string, data: Partial<User>) => void;
   markNotificationRead: (notificationId: string) => void;
   getUnreadCount: (userId: string) => number;
+  addProjectRequest: (request: Omit<ProjectRequest, 'id' | 'status' | 'createdAt'>) => void;
+  approveProjectRequest: (requestId: string) => void;
+  rejectProjectRequest: (requestId: string, reason: string) => void;
 }
 
 const CRMContext = createContext<CRMContextType | null>(null);
@@ -43,23 +47,22 @@ export const useCRM = () => {
   return ctx;
 };
 
-const INITIAL_LEADS: Lead[] = [];
-
 export const CRMProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [leads, setLeads] = useState<Lead[]>(INITIAL_LEADS);
+  const [leads, setLeads] = useState<Lead[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [developers, setDevelopers] = useState<Developer[]>([]);
   const [folders, setFolders] = useState<LeadFolder[]>([]);
   const [users, setUsers] = useState<User[]>(MOCK_USERS);
   const [activities, setActivities] = useState<Activity[]>([]);
+  const [projectRequests, setProjectRequests] = useState<ProjectRequest[]>([]);
 
   const addActivity = (type: Activity['type'], title: string, description: string, userId?: string) => {
     setActivities(prev => [{ id: `act-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`, type, title, description, userId, createdAt: new Date().toISOString() }, ...prev]);
   };
 
   const addNotification = (n: Omit<Notification, 'id' | 'read' | 'createdAt'>) => {
-    setNotifications(prev => [...prev, { ...n, id: `notif-${Date.now()}`, read: false, createdAt: new Date().toISOString() }]);
+    setNotifications(prev => [...prev, { ...n, id: `notif-${Date.now()}-${Math.random().toString(36).slice(2, 4)}`, read: false, createdAt: new Date().toISOString() }]);
   };
 
   // Folder CRUD
@@ -101,23 +104,7 @@ export const CRMProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       if (l.id !== leadId) return l;
       const updated = { ...l, status, updatedAt: new Date().toISOString() };
       if (status === 'Converted') {
-        const newProject: Project = {
-          id: `p-${Date.now()}`,
-          name: `${l.name} Project`,
-          leadId: l.id,
-          clientName: l.name,
-          clientEmail: l.email,
-          clientPhone: l.phone,
-          status: 'Planning',
-          assignedTo: '2',
-          notes: l.notes,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        };
-        setProjects(prev => [...prev, newProject]);
-        addNotification({ title: 'Lead Converted', message: `${l.name} has been converted to a project`, type: 'conversion', userId: '2' });
-        addNotification({ title: 'Lead Converted', message: `${l.name} has been converted to a project`, type: 'conversion', userId: '1' });
-        addActivity('lead_status_changed', 'Lead Converted', `"${l.name}" converted to project`, userId);
+        addActivity('lead_status_changed', 'Lead Converted', `"${l.name}" marked as converted — awaiting project request`, userId);
       } else {
         addActivity('lead_status_changed', 'Lead Status Updated', `"${l.name}" status changed to ${status}`, userId);
       }
@@ -136,6 +123,56 @@ export const CRMProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const addLeadNote = useCallback((leadId: string, note: Omit<Note, 'id' | 'createdAt'>) => {
     setLeads(prev => prev.map(l => l.id === leadId ? { ...l, notes: [...l.notes, { ...note, id: `n-${Date.now()}`, createdAt: new Date().toISOString() }], updatedAt: new Date().toISOString() } : l));
   }, []);
+
+  // Project Request workflow
+  const addProjectRequest = useCallback((request: Omit<ProjectRequest, 'id' | 'status' | 'createdAt'>) => {
+    const id = `pr-${Date.now()}`;
+    setProjectRequests(prev => [...prev, { ...request, id, status: 'pending', createdAt: new Date().toISOString() }]);
+    // Notify all admins
+    users.filter(u => u.role === 'admin').forEach(admin => {
+      addNotification({ title: 'New Project Request', message: `"${request.projectName}" from ${request.clientName} needs approval`, type: 'info', userId: admin.id });
+    });
+    addActivity('project_request_created', 'Project Request Submitted', `"${request.projectName}" submitted for admin approval`, request.requestedBy);
+  }, [users]);
+
+  const approveProjectRequest = useCallback((requestId: string) => {
+    const request = projectRequests.find(r => r.id === requestId);
+    if (!request) return;
+    setProjectRequests(prev => prev.map(r => r.id === requestId ? { ...r, status: 'approved' as const } : r));
+    // Create the project and assign to tech lead
+    const techLead = users.find(u => u.role === 'tech_lead');
+    const now = new Date().toISOString();
+    const lead = leads.find(l => l.id === request.leadId);
+    const newProject: Project = {
+      id: `p-${Date.now()}`,
+      name: request.projectName,
+      leadId: request.leadId,
+      clientName: request.clientName,
+      clientEmail: request.clientEmail,
+      clientPhone: request.clientPhone,
+      status: 'Planning',
+      assignedTo: techLead?.id || '2',
+      notes: lead?.notes || [],
+      createdAt: now,
+      updatedAt: now,
+    };
+    setProjects(prev => [...prev, newProject]);
+    // Notify tech lead
+    if (techLead) {
+      addNotification({ title: 'New Project Assigned', message: `"${request.projectName}" has been approved and assigned to you`, type: 'conversion', userId: techLead.id });
+    }
+    // Notify requester
+    addNotification({ title: 'Request Approved', message: `Your project request "${request.projectName}" has been approved`, type: 'info', userId: request.requestedBy });
+    addActivity('project_request_approved', 'Project Request Approved', `"${request.projectName}" approved and assigned to ${techLead?.name || 'Tech Lead'}`);
+  }, [projectRequests, users, leads]);
+
+  const rejectProjectRequest = useCallback((requestId: string, reason: string) => {
+    const request = projectRequests.find(r => r.id === requestId);
+    if (!request) return;
+    setProjectRequests(prev => prev.map(r => r.id === requestId ? { ...r, status: 'rejected' as const, rejectionReason: reason } : r));
+    addNotification({ title: 'Request Rejected', message: `Your project request "${request.projectName}" was rejected: ${reason}`, type: 'info', userId: request.requestedBy });
+    addActivity('project_request_rejected', 'Project Request Rejected', `"${request.projectName}" rejected — ${reason}`);
+  }, [projectRequests]);
 
   const addProject = useCallback((project: Omit<Project, 'id' | 'notes' | 'createdAt' | 'updatedAt'>) => {
     const now = new Date().toISOString();
@@ -184,7 +221,6 @@ export const CRMProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setDevelopers(prev => prev.map(d => d.id === id ? { ...d, name } : d));
   }, []);
 
-  // User CRUD
   const addUser = useCallback((user: Omit<User, 'id'>) => {
     setUsers(prev => [...prev, { ...user, id: `u-${Date.now()}` }]);
   }, []);
@@ -207,13 +243,14 @@ export const CRMProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   return (
     <CRMContext.Provider value={{
-      leads, projects, notifications, folders, users, activities,
+      leads, projects, notifications, folders, users, activities, projectRequests,
       addFolder, deleteFolder, renameFolder,
       addLead, updateLead, deleteLead, updateLeadStatus, assignLead, addLeadNote,
       addProject, deleteProject, updateProjectStatus, renameProject, setProjectDeadline, addProjectNote, assignDeveloper,
       markNotificationRead, getUnreadCount,
       developers, addDeveloper, removeDeveloper, updateDeveloper,
       addUser, removeUser, updateUser,
+      addProjectRequest, approveProjectRequest, rejectProjectRequest,
     }}>
       {children}
     </CRMContext.Provider>
