@@ -46,6 +46,8 @@ const Projects = () => {
       toast.error('Please fill in project name, client name and email');
       return;
     }
+    if (!isValidEmail(newProject.clientEmail)) { toast.error('Please enter a valid client email'); return; }
+    if (newProject.clientPhone && !isValidPhone(newProject.clientPhone)) { toast.error('Please enter a valid phone number'); return; }
     addProject({
       name: newProject.name,
       clientName: newProject.clientName,
