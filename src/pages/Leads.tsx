@@ -147,6 +147,8 @@ const Leads = () => {
 
   const handleAddLead = () => {
     if (!newLead.name || !newLead.phone) { toast.error('Name and phone are required'); return; }
+    if (newLead.email && !isValidEmail(newLead.email)) { toast.error('Please enter a valid email'); return; }
+    if (!isValidPhone(newLead.phone)) { toast.error('Please enter a valid phone number'); return; }
     addLead({ ...newLead, status: 'New', folderId: selectedFolder || undefined });
     setNewLead({ name: '', email: '', phone: '', company: '', source: '' });
     setAddOpen(false);
