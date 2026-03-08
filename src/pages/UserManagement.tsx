@@ -12,6 +12,7 @@ import { UserCircle, Plus, Trash2, Pencil, Mail, Phone, Calendar, ExternalLink }
 import { toast } from 'sonner';
 
 const UserManagement = () => {
+  const navigate = useNavigate();
   const { users, addUser, removeUser, updateUser } = useCRM();
   const [addOpen, setAddOpen] = useState(false);
   const [editUserId, setEditUserId] = useState<string | null>(null);
