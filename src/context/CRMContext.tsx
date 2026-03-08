@@ -295,6 +295,10 @@ export const CRMProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setNotifications(prev => prev.map(n => n.id === notificationId ? { ...n, read: true } : n));
   }, []);
 
+  const markAllNotificationsRead = useCallback((userId: string) => {
+    setNotifications(prev => prev.map(n => n.userId === userId ? { ...n, read: true } : n));
+  }, []);
+
   const getUnreadCount = useCallback((userId: string) => {
     return notifications.filter(n => n.userId === userId && !n.read).length;
   }, [notifications]);
