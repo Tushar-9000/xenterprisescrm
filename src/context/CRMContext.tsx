@@ -65,11 +65,18 @@ export const CRMProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setNotifications(prev => [...prev, { ...n, id: `notif-${Date.now()}-${Math.random().toString(36).slice(2, 4)}`, read: false, createdAt: new Date().toISOString() }]);
   };
 
+  const notifyByRole = (roles: string[], title: string, message: string, type: Notification['type'] = 'info', excludeUserId?: string) => {
+    users.filter(u => roles.includes(u.role) && u.id !== excludeUserId).forEach(u => {
+      addNotification({ title, message, type, userId: u.id });
+    });
+  };
+
   // Folder CRUD
   const addFolder = useCallback((name: string, location: string) => {
     setFolders(prev => [...prev, { id: `f-${Date.now()}`, name, location, createdAt: new Date().toISOString() }]);
     addActivity('folder_added', 'Folder Created', `Folder "${name}" created at ${location}`);
-  }, []);
+    notifyByRole(['admin', 'sales_manager'], 'Folder Created', `New folder "${name}" created at ${location}`);
+  }, [users]);
 
   const deleteFolder = useCallback((folderId: string) => {
     const folder = folders.find(f => f.id === folderId);
