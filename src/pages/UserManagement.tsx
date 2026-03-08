@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { isValidEmail, isValidPhone, sanitizePhone } from '@/lib/validation';
 import { useNavigate } from 'react-router-dom';
 import { useCRM } from '@/context/CRMContext';
 import { ROLE_LABELS, UserRole } from '@/types/crm';
