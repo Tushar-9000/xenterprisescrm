@@ -33,20 +33,95 @@ const Leads = () => {
   const [noteText, setNoteText] = useState('');
   const [newLead, setNewLead] = useState({ name: '', email: '', phone: '', company: '', source: '' });
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [telecallerFolder, setTelecallerFolder] = useState<string | null>(null);
 
   if (!user) return null;
 
   const isManager = user.role === 'sales_manager' || user.role === 'admin';
   const isTelecaller = user.role === 'telecaller';
 
-  // Telecaller: show assigned leads flat
+  // Telecaller: show assigned leads grouped by folder
   if (isTelecaller) {
     const myLeads = leads.filter(l => l.assignedTo === user.id);
+
+    // Group leads by folder
+    const folderIds = [...new Set(myLeads.map(l => l.folderId).filter(Boolean))] as string[];
+    const unfoldered = myLeads.filter(l => !l.folderId);
+    const currentTcFolder = folders.find(f => f.id === telecallerFolder);
+    const tcFolderLeads = telecallerFolder ? myLeads.filter(l => l.folderId === telecallerFolder) : [];
+
+    if (telecallerFolder) {
+      return (
+        <div className="space-y-6 animate-fade-in">
+          <div className="flex items-center gap-3">
+            <Button variant="ghost" size="icon" onClick={() => setTelecallerFolder(null)}><ArrowLeft className="h-4 w-4" /></Button>
+            <div>
+              <h1 className="text-3xl font-bold">{currentTcFolder?.name}</h1>
+              {currentTcFolder?.location && <p className="text-muted-foreground text-sm flex items-center gap-1"><MapPin className="h-3 w-3" />{currentTcFolder.location}</p>}
+              <p className="text-muted-foreground text-sm">{tcFolderLeads.length} leads assigned</p>
+            </div>
+          </div>
+          <LeadTable leads={tcFolderLeads} user={user} isManager={false} isTelecaller={true} />
+        </div>
+      );
+    }
+
     return (
       <div className="space-y-6 animate-fade-in">
-        <h1 className="text-3xl font-bold">My Leads</h1>
-        <p className="text-muted-foreground">{myLeads.length} leads assigned</p>
-        <LeadTable leads={myLeads} user={user} isManager={false} isTelecaller={true} />
+        <div>
+          <h1 className="text-3xl font-bold">My Leads</h1>
+          <p className="text-muted-foreground mt-1">{myLeads.length} leads assigned across {folderIds.length} folder{folderIds.length !== 1 ? 's' : ''}</p>
+        </div>
+
+        {folderIds.length === 0 && unfoldered.length === 0 ? (
+          <Card className="bg-card border-border">
+            <CardContent className="py-16 text-center">
+              <FolderOpen className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
+              <p className="text-muted-foreground">No leads assigned to you yet.</p>
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {folderIds.map(fid => {
+              const folder = folders.find(f => f.id === fid);
+              if (!folder) return null;
+              const count = myLeads.filter(l => l.folderId === fid).length;
+              return (
+                <Card key={fid} className="bg-card border-border cursor-pointer hover:border-primary/50 transition-colors group" onClick={() => setTelecallerFolder(fid)}>
+                  <CardContent className="p-5">
+                    <div className="flex items-center gap-3">
+                      <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                        <FolderOpen className="h-5 w-5 text-primary" />
+                      </div>
+                      <div>
+                        <p className="font-semibold">{folder.name}</p>
+                        {folder.location && (
+                          <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5"><MapPin className="h-3 w-3" />{folder.location}</p>
+                        )}
+                      </div>
+                    </div>
+                    <p className="text-sm text-muted-foreground mt-3">{count} lead{count !== 1 ? 's' : ''} assigned</p>
+                  </CardContent>
+                </Card>
+              );
+            })}
+            {unfoldered.length > 0 && (
+              <Card className="bg-card border-border">
+                <CardContent className="p-5">
+                  <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 rounded-lg bg-muted flex items-center justify-center">
+                      <FolderOpen className="h-5 w-5 text-muted-foreground" />
+                    </div>
+                    <div>
+                      <p className="font-semibold">Uncategorized</p>
+                      <p className="text-xs text-muted-foreground">{unfoldered.length} lead{unfoldered.length !== 1 ? 's' : ''}</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </div>
+        )}
       </div>
     );
   }
