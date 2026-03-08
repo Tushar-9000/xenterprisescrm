@@ -427,45 +427,23 @@ const Leads = () => {
             Lead "<span className="font-medium text-foreground">{convertLead?.name}</span>" is finalized. Fill in project details to send an approval request to Admin. Once approved, it will be assigned to Tech Lead.
           </p>
           <div className="space-y-3">
-            <Input
-              placeholder="Project Name *"
-              value={projectDetails.projectName}
-              onChange={e => setProjectDetails(p => ({ ...p, projectName: e.target.value }))}
-            />
-            <Textarea
-              placeholder="Project description / requirements..."
-              value={projectDetails.description}
-              onChange={e => setProjectDetails(p => ({ ...p, description: e.target.value }))}
-            />
+            <Input placeholder="Project Name *" value={projectDetails.projectName} onChange={e => setProjectDetails(p => ({ ...p, projectName: e.target.value }))} />
+            <Textarea placeholder="Project description / requirements..." value={projectDetails.description} onChange={e => setProjectDetails(p => ({ ...p, description: e.target.value }))} />
             <div className="bg-secondary/50 rounded p-3 text-sm space-y-1">
               <p><span className="text-muted-foreground">Client:</span> {convertLead?.name}</p>
               <p><span className="text-muted-foreground">Email:</span> {convertLead?.email}</p>
               <p><span className="text-muted-foreground">Phone:</span> {convertLead?.phone}</p>
               {convertLead?.company && <p><span className="text-muted-foreground">Company:</span> {convertLead.company}</p>}
             </div>
-            <Button
-              className="w-full"
-              onClick={() => {
-                if (!projectDetails.projectName.trim()) { toast.error('Project name is required'); return; }
-                if (!convertLead) return;
-                addProjectRequest({
-                  leadId: convertLead.id,
-                  leadName: convertLead.name,
-                  projectName: projectDetails.projectName.trim(),
-                  clientName: convertLead.name,
-                  clientEmail: convertLead.email,
-                  clientPhone: convertLead.phone,
-                  description: projectDetails.description.trim(),
-                  requestedBy: user.id,
-                });
-                updateLeadStatus(convertLead.id, 'Converted', user.id);
-                setConvertLead(null);
-                setProjectDetails({ projectName: '', description: '' });
-                toast.success('Project request sent to Admin for approval');
-              }}
-            >
-              Send Request to Admin
-            </Button>
+            <Button className="w-full" onClick={() => {
+              if (!projectDetails.projectName.trim()) { toast.error('Project name is required'); return; }
+              if (!convertLead) return;
+              addProjectRequest({ leadId: convertLead.id, leadName: convertLead.name, projectName: projectDetails.projectName.trim(), clientName: convertLead.name, clientEmail: convertLead.email, clientPhone: convertLead.phone, description: projectDetails.description.trim(), requestedBy: user.id });
+              updateLeadStatus(convertLead.id, 'Converted', user.id);
+              setConvertLead(null);
+              setProjectDetails({ projectName: '', description: '' });
+              toast.success('Project request sent to Admin for approval');
+            }}>Send Request to Admin</Button>
           </div>
         </DialogContent>
       </Dialog>
