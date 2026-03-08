@@ -195,44 +195,62 @@ export const CRMProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const now = new Date().toISOString();
     setProjects(prev => [...prev, { ...project, id: `p-${Date.now()}`, notes: [], createdAt: now, updatedAt: now }]);
     addActivity('project_added', 'Project Created', `New project "${project.name}" for ${project.clientName}`);
-  }, []);
+    notifyByRole(['admin', 'tech_lead'], 'New Project Created', `"${project.name}" for ${project.clientName}`);
+  }, [users]);
 
   const deleteProject = useCallback((projectId: string) => {
     const project = projects.find(p => p.id === projectId);
     setProjects(prev => prev.filter(p => p.id !== projectId));
     addActivity('project_deleted', 'Project Deleted', `Project "${project?.name || projectId}" removed`);
-  }, [projects]);
+    notifyByRole(['admin', 'tech_lead'], 'Project Deleted', `"${project?.name || projectId}" was removed`);
+  }, [projects, users]);
 
   const updateProjectStatus = useCallback((projectId: string, status: ProjectStatus) => {
     const project = projects.find(p => p.id === projectId);
     setProjects(prev => prev.map(p => p.id === projectId ? { ...p, status, updatedAt: new Date().toISOString() } : p));
     addActivity('project_status_changed', 'Project Status Updated', `"${project?.name || projectId}" status changed to ${status}`);
-  }, [projects]);
+    notifyByRole(['admin', 'tech_lead'], 'Project Status Changed', `"${project?.name || projectId}" → ${status}`);
+  }, [projects, users]);
 
   const renameProject = useCallback((projectId: string, name: string) => {
     setProjects(prev => prev.map(p => p.id === projectId ? { ...p, name, updatedAt: new Date().toISOString() } : p));
   }, []);
 
   const setProjectDeadline = useCallback((projectId: string, deadline: string) => {
+    const project = projects.find(p => p.id === projectId);
     setProjects(prev => prev.map(p => p.id === projectId ? { ...p, deadline, updatedAt: new Date().toISOString() } : p));
-  }, []);
+    notifyByRole(['admin', 'tech_lead'], 'Deadline Set', `"${project?.name || projectId}" deadline: ${deadline}`);
+  }, [projects, users]);
 
   const addProjectNote = useCallback((projectId: string, note: Omit<Note, 'id' | 'createdAt'>) => {
+    const project = projects.find(p => p.id === projectId);
     setProjects(prev => prev.map(p => p.id === projectId ? { ...p, notes: [...p.notes, { ...note, id: `n-${Date.now()}`, createdAt: new Date().toISOString() }], updatedAt: new Date().toISOString() } : p));
-  }, []);
+    if (project?.assignedTo && project.assignedTo !== note.createdBy) {
+      addNotification({ title: 'New Note on Project', message: `A note was added to "${project.name}"`, type: 'info', userId: project.assignedTo });
+    }
+  }, [projects]);
 
   const assignDeveloper = useCallback((projectId: string, developerId: string) => {
+    const project = projects.find(p => p.id === projectId);
+    const dev = developers.find(d => d.id === developerId);
     setProjects(prev => prev.map(p => p.id === projectId ? { ...p, assignedDeveloper: developerId, updatedAt: new Date().toISOString() } : p));
-  }, []);
+    addActivity('developer_assigned', 'Developer Assigned', `${dev?.name || developerId} assigned to "${project?.name || projectId}"`);
+    notifyByRole(['admin', 'tech_lead'], 'Developer Assigned', `${dev?.name || developerId} assigned to "${project?.name || projectId}"`);
+  }, [projects, developers, users]);
 
   const addDeveloper = useCallback((name: string) => {
     setDevelopers(prev => [...prev, { id: `d-${Date.now()}`, name }]);
-  }, []);
+    addActivity('developer_added', 'Developer Added', `Developer "${name}" added`);
+    notifyByRole(['admin', 'tech_lead'], 'Developer Added', `New developer "${name}" added`);
+  }, [users]);
 
   const removeDeveloper = useCallback((id: string) => {
+    const dev = developers.find(d => d.id === id);
     setDevelopers(prev => prev.filter(d => d.id !== id));
     setProjects(prev => prev.map(p => p.assignedDeveloper === id ? { ...p, assignedDeveloper: undefined } : p));
-  }, []);
+    addActivity('developer_removed', 'Developer Removed', `Developer "${dev?.name || id}" removed`);
+    notifyByRole(['admin', 'tech_lead'], 'Developer Removed', `Developer "${dev?.name || id}" was removed`);
+  }, [developers, users]);
 
   const updateDeveloper = useCallback((id: string, name: string) => {
     setDevelopers(prev => prev.map(d => d.id === id ? { ...d, name } : d));
