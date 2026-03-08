@@ -96,8 +96,10 @@ export const CRMProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   }, []);
 
   const deleteLead = useCallback((leadId: string) => {
+    const lead = leads.find(l => l.id === leadId);
     setLeads(prev => prev.filter(l => l.id !== leadId));
-  }, []);
+    addActivity('lead_deleted', 'Lead Deleted', `Lead "${lead?.name || leadId}" removed`);
+  }, [leads]);
 
   const updateLeadStatus = useCallback((leadId: string, status: LeadStatus, userId: string) => {
     setLeads(prev => prev.map(l => {
