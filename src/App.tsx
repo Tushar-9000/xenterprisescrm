@@ -52,22 +52,23 @@ const AppRoutes = () => {
   );
 };
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <ThemeProvider>
-      <AuthProvider>
-        <CRMProvider>
-          <TooltipProvider>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
-              <AppRoutes />
-            </BrowserRouter>
-          </TooltipProvider>
-        </CRMProvider>
-      </AuthProvider>
-    </ThemeProvider>
-  </QueryClientProvider>
-);
-
+const App = () => {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider>
+        <AuthProvider>
+          <CRMProvider>
+            <TooltipProvider>
+              <Toaster />
+              <Sonner />
+              <BrowserRouter>
+                <AppRoutes />
+              </BrowserRouter>
+            </TooltipProvider>
+          </CRMProvider>
+        </AuthProvider>
+      </ThemeProvider>
+    </QueryClientProvider>
+  );
+};
 export default App;
