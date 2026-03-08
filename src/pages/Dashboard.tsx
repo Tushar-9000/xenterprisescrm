@@ -192,6 +192,37 @@ const AdminDashboard = ({ leads, projects, notifications, activities }: { leads:
           </CardContent>
         </Card>
       </div>
+
+      {/* Recent Activities */}
+      <Card className="bg-card border-border">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-lg flex items-center gap-2"><ActivityIcon className="h-4 w-4 text-primary" /> Recent Activities</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {activities.length === 0 ? (
+            <p className="text-sm text-muted-foreground text-center py-8">No activities yet. Actions across the CRM will appear here.</p>
+          ) : (
+            <div className="space-y-1">
+              {activities.slice(0, 15).map(activity => {
+                const Icon = ACTIVITY_ICONS[activity.type] || ActivityIcon;
+                const colorClass = ACTIVITY_COLORS[activity.type] || 'bg-secondary text-muted-foreground';
+                return (
+                  <div key={activity.id} className="flex items-start gap-3 p-3 rounded-lg hover:bg-secondary/20 transition-colors">
+                    <div className={`h-8 w-8 rounded-full flex items-center justify-center shrink-0 mt-0.5 ${colorClass}`}>
+                      <Icon className="h-3.5 w-3.5" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium">{activity.title}</p>
+                      <p className="text-xs text-muted-foreground truncate">{activity.description}</p>
+                    </div>
+                    <span className="text-xs text-muted-foreground whitespace-nowrap shrink-0">{formatTimeAgo(activity.createdAt)}</span>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 };
