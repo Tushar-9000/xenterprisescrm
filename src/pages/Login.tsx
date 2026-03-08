@@ -5,15 +5,24 @@ import { MOCK_USERS, ROLE_LABELS, UserRole } from '@/types/crm';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { Moon, Sun, ShieldCheck, BarChart3, Users, Zap } from 'lucide-react';
+import { Moon, Sun, ShieldCheck, BarChart3, Users, Zap, FolderOpen, Bell, Building2, TrendingUp, ClipboardList, Target } from 'lucide-react';
 
 const ROLE_ORDER: UserRole[] = ['admin', 'tech_lead', 'sales_manager', 'telecaller'];
 
 const FEATURES = [
-  { icon: ShieldCheck, title: 'Role-Based Access', desc: 'Tailored dashboards per role' },
-  { icon: BarChart3, title: 'Lead Pipeline', desc: 'Track every opportunity' },
-  { icon: Users, title: 'Team Management', desc: 'Coordinate your workforce' },
-  { icon: Zap, title: 'Real-time Updates', desc: 'Instant notifications' },
+  { icon: ShieldCheck, title: 'Role-Based Access', desc: 'Admin, Tech Lead, Sales Manager & Telecaller — each with tailored dashboards' },
+  { icon: BarChart3, title: 'Lead Pipeline', desc: 'Track leads from creation to conversion with real-time status updates' },
+  { icon: Users, title: 'Team Management', desc: 'Manage developers, assign tasks, and monitor team performance' },
+  { icon: Zap, title: 'Real-time Activities', desc: 'Live activity feed to monitor all company operations instantly' },
+  { icon: FolderOpen, title: 'Folder Organization', desc: 'Leads organized in folders by project for structured telecalling' },
+  { icon: Bell, title: 'Smart Notifications', desc: 'Stay updated with role-specific alerts and task reminders' },
+];
+
+const WHAT_WE_DO = [
+  { icon: Building2, text: 'End-to-end real estate CRM for managing projects, leads, and sales teams' },
+  { icon: Target, text: 'Automated lead assignment and follow-up tracking across your workforce' },
+  { icon: TrendingUp, text: 'Performance leaderboards and analytics to drive team productivity' },
+  { icon: ClipboardList, text: 'Project-wise lead segregation with developer and sales manager coordination' },
 ];
 
 const Login = () => {
