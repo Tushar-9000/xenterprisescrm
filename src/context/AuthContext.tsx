@@ -7,6 +7,8 @@ interface AuthContextType {
   loginAs: (user: User) => void;
   logout: () => void;
   isAuthenticated: boolean;
+  passwords: Record<string, string>;
+  updatePassword: (userId: string, newPassword: string) => void;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -19,21 +21,30 @@ export const useAuth = () => {
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [passwords, setPasswords] = useState<Record<string, string>>(() => {
+    const map: Record<string, string> = {};
+    MOCK_USERS.forEach(u => { map[u.id] = u.password || `${u.name}123`; });
+    return map;
+  });
 
-  const login = useCallback((email: string, _password: string) => {
+  const login = useCallback((email: string, password: string) => {
     const found = MOCK_USERS.find(u => u.email.toLowerCase() === email.toLowerCase());
-    if (found) {
+    if (found && passwords[found.id] === password) {
       setUser(found);
       return true;
     }
     return false;
-  }, []);
+  }, [passwords]);
 
   const loginAs = useCallback((u: User) => setUser(u), []);
   const logout = useCallback(() => setUser(null), []);
 
+  const updatePassword = useCallback((userId: string, newPassword: string) => {
+    setPasswords(prev => ({ ...prev, [userId]: newPassword }));
+  }, []);
+
   return (
-    <AuthContext.Provider value={{ user, login, loginAs, logout, isAuthenticated: !!user }}>
+    <AuthContext.Provider value={{ user, login, loginAs, logout, isAuthenticated: !!user, passwords, updatePassword }}>
       {children}
     </AuthContext.Provider>
   );

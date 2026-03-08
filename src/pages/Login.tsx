@@ -5,7 +5,7 @@ import { MOCK_USERS, ROLE_LABELS, UserRole } from '@/types/crm';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { Moon, Sun, BarChart3, Users, FolderOpen, TrendingUp } from 'lucide-react';
+import { Moon, Sun, BarChart3, Users, FolderOpen, TrendingUp, Eye, EyeOff } from 'lucide-react';
 
 const ROLE_ORDER: UserRole[] = ['admin', 'tech_lead', 'sales_manager', 'telecaller'];
 
@@ -22,6 +22,7 @@ const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -113,13 +114,22 @@ const Login = () => {
             </div>
             <div>
               <label className="text-sm font-medium text-login-card-foreground">Password</label>
-              <Input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                className="mt-1 bg-secondary/10 border-border text-login-card-foreground placeholder:text-muted-foreground"
-              />
+              <div className="relative mt-1">
+                <Input
+                  type={showPassword ? 'text' : 'password'}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="bg-secondary/10 border-border text-login-card-foreground placeholder:text-muted-foreground pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
             </div>
 
             <Button type="submit" className="w-full mt-2 bg-primary text-primary-foreground hover:bg-primary/90 font-semibold py-5">
@@ -136,7 +146,7 @@ const Login = () => {
                 onClick={() => {
                   setName(u.name);
                   setEmail(u.email);
-                  setPassword('password123');
+                  setPassword(u.password || `${u.name}123`);
                 }}
                 className="w-full flex items-center justify-between px-4 py-3 rounded-md text-login-card-foreground hover:bg-secondary/10 transition-colors group"
               >

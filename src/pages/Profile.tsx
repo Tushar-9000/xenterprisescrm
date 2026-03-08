@@ -6,11 +6,11 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
-import { UserCircle, Camera, Save, ArrowLeft } from 'lucide-react';
+import { UserCircle, Camera, Save, ArrowLeft, Eye, EyeOff, KeyRound } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
 const Profile = () => {
-  const { user: currentUser } = useAuth();
+  const { user: currentUser, passwords, updatePassword } = useAuth();
   const { users, updateUser } = useCRM();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -176,6 +176,11 @@ const Profile = () => {
           </div>
         </div>
 
+        {/* Password Change - Admin only */}
+        {canEditAll && (
+          <PasswordChangeSection userId={targetUser.id} currentPassword={passwords[targetUser.id] || ''} onUpdate={updatePassword} />
+        )}
+
         {!canEditAll && (
           <p className="text-xs text-muted-foreground text-center">
             Only username and profile picture can be changed. Contact your admin to update other details.
@@ -186,6 +191,53 @@ const Profile = () => {
           <Save className="h-4 w-4 mr-2" /> Save Changes
         </Button>
       </div>
+    </div>
+  );
+};
+
+const PasswordChangeSection = ({ userId, currentPassword, onUpdate }: { userId: string; currentPassword: string; onUpdate: (id: string, pw: string) => void }) => {
+  const [newPassword, setNewPassword] = useState('');
+  const [showCurrent, setShowCurrent] = useState(false);
+  const [showNew, setShowNew] = useState(false);
+
+  const handleChange = () => {
+    if (newPassword.length < 4) {
+      toast.error('Password must be at least 4 characters');
+      return;
+    }
+    onUpdate(userId, newPassword);
+    setNewPassword('');
+    toast.success('Password updated successfully');
+  };
+
+  return (
+    <div className="border-t border-border pt-5 space-y-3">
+      <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
+        <KeyRound className="h-4 w-4" /> Change Password
+      </h3>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label className="text-sm font-medium text-foreground">Current Password</label>
+          <div className="relative mt-1">
+            <Input value={currentPassword} disabled type={showCurrent ? 'text' : 'password'} />
+            <button type="button" onClick={() => setShowCurrent(!showCurrent)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
+              {showCurrent ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+            </button>
+          </div>
+        </div>
+        <div>
+          <label className="text-sm font-medium text-foreground">New Password</label>
+          <div className="relative mt-1">
+            <Input value={newPassword} onChange={e => setNewPassword(e.target.value)} type={showNew ? 'text' : 'password'} placeholder="Enter new password" />
+            <button type="button" onClick={() => setShowNew(!showNew)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
+              {showNew ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+            </button>
+          </div>
+        </div>
+      </div>
+      <Button variant="outline" onClick={handleChange} disabled={!newPassword} className="w-full sm:w-auto">
+        Update Password
+      </Button>
     </div>
   );
 };
