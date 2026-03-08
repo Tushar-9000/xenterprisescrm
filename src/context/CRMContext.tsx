@@ -309,7 +309,7 @@ export const CRMProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       addFolder, deleteFolder, renameFolder,
       addLead, updateLead, deleteLead, updateLeadStatus, assignLead, addLeadNote,
       addProject, deleteProject, updateProjectStatus, renameProject, setProjectDeadline, addProjectNote, assignDeveloper,
-      markNotificationRead, getUnreadCount,
+      markNotificationRead, markAllNotificationsRead, getUnreadCount,
       developers, addDeveloper, removeDeveloper, updateDeveloper,
       addUser, removeUser, updateUser,
       addProjectRequest, approveProjectRequest, rejectProjectRequest,
