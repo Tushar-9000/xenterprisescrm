@@ -33,6 +33,7 @@ const Leads = () => {
   const [noteText, setNoteText] = useState('');
   const [newLead, setNewLead] = useState({ name: '', email: '', phone: '', company: '', source: '' });
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [telecallerFolder, setTelecallerFolder] = useState<string | null>(null);
 
   if (!user) return null;
 
