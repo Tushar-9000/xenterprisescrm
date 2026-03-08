@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { isValidEmail, isValidPhone, sanitizePhone } from '@/lib/validation';
 import { format } from 'date-fns';
 import { useAuth } from '@/context/AuthContext';
 import { useCRM } from '@/context/CRMContext';
