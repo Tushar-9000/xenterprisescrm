@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react';
+import { isValidEmail, isValidPhone, sanitizePhone } from '@/lib/validation';
 import { useAuth } from '@/context/AuthContext';
 import { useCRM } from '@/context/CRMContext';
 import { LeadStatus } from '@/types/crm';
