@@ -33,6 +33,7 @@ interface CRMContextType {
   removeUser: (userId: string) => void;
   updateUser: (userId: string, data: Partial<User>) => void;
   markNotificationRead: (notificationId: string) => void;
+  markAllNotificationsRead: (userId: string) => void;
   getUnreadCount: (userId: string) => number;
   addProjectRequest: (request: Omit<ProjectRequest, 'id' | 'status' | 'createdAt'>) => void;
   approveProjectRequest: (requestId: string) => void;
