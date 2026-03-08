@@ -61,6 +61,7 @@ export const CRMProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       if (status === 'Converted') {
         const newProject: Project = {
           id: `p-${Date.now()}`,
+          name: `${l.name} Project`,
           leadId: l.id,
           clientName: l.name,
           clientEmail: l.email,
