@@ -12,6 +12,7 @@ import Projects from "./pages/Projects";
 import Notifications from "./pages/Notifications";
 import Leaderboard from "./pages/Leaderboard";
 import UserManagement from "./pages/UserManagement";
+import DeveloperManagement from "./pages/DeveloperManagement";
 import SettingsPage from "./pages/SettingsPage";
 import AppLayout from "./components/layout/AppLayout";
 import NotFound from "./pages/NotFound";
