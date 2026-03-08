@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
-import { Lead, Project, Notification, Note, LeadStatus, ProjectStatus } from '@/types/crm';
+import { Lead, Project, Notification, Note, LeadStatus, ProjectStatus, Developer, MOCK_DEVELOPERS } from '@/types/crm';
 
 interface CRMContextType {
   leads: Lead[];
@@ -12,8 +12,14 @@ interface CRMContextType {
   addProject: (project: Omit<Project, 'id' | 'notes' | 'createdAt' | 'updatedAt'>) => void;
   deleteProject: (projectId: string) => void;
   updateProjectStatus: (projectId: string, status: ProjectStatus) => void;
+  renameProject: (projectId: string, name: string) => void;
+  setProjectDeadline: (projectId: string, deadline: string) => void;
   addProjectNote: (projectId: string, note: Omit<Note, 'id' | 'createdAt'>) => void;
   assignDeveloper: (projectId: string, developerId: string) => void;
+  developers: Developer[];
+  addDeveloper: (name: string) => void;
+  removeDeveloper: (id: string) => void;
+  updateDeveloper: (id: string, name: string) => void;
   markNotificationRead: (notificationId: string) => void;
   getUnreadCount: (userId: string) => number;
 }
@@ -37,6 +43,7 @@ export const CRMProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [leads, setLeads] = useState<Lead[]>(INITIAL_LEADS);
   const [projects, setProjects] = useState<Project[]>([]);
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [developers, setDevelopers] = useState<Developer[]>(MOCK_DEVELOPERS);
 
   const addNotification = (n: Omit<Notification, 'id' | 'read' | 'createdAt'>) => {
     setNotifications(prev => [...prev, { ...n, id: `notif-${Date.now()}`, read: false, createdAt: new Date().toISOString() }]);
@@ -54,6 +61,7 @@ export const CRMProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       if (status === 'Converted') {
         const newProject: Project = {
           id: `p-${Date.now()}`,
+          name: `${l.name} Project`,
           leadId: l.id,
           clientName: l.name,
           clientEmail: l.email,
@@ -94,12 +102,34 @@ export const CRMProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setProjects(prev => prev.map(p => p.id === projectId ? { ...p, status, updatedAt: new Date().toISOString() } : p));
   }, []);
 
+  const renameProject = useCallback((projectId: string, name: string) => {
+    setProjects(prev => prev.map(p => p.id === projectId ? { ...p, name, updatedAt: new Date().toISOString() } : p));
+  }, []);
+
+  const setProjectDeadline = useCallback((projectId: string, deadline: string) => {
+    setProjects(prev => prev.map(p => p.id === projectId ? { ...p, deadline, updatedAt: new Date().toISOString() } : p));
+  }, []);
+
   const addProjectNote = useCallback((projectId: string, note: Omit<Note, 'id' | 'createdAt'>) => {
     setProjects(prev => prev.map(p => p.id === projectId ? { ...p, notes: [...p.notes, { ...note, id: `n-${Date.now()}`, createdAt: new Date().toISOString() }], updatedAt: new Date().toISOString() } : p));
   }, []);
 
   const assignDeveloper = useCallback((projectId: string, developerId: string) => {
     setProjects(prev => prev.map(p => p.id === projectId ? { ...p, assignedDeveloper: developerId, updatedAt: new Date().toISOString() } : p));
+  }, []);
+
+  const addDeveloper = useCallback((name: string) => {
+    setDevelopers(prev => [...prev, { id: `d-${Date.now()}`, name }]);
+  }, []);
+
+  const removeDeveloper = useCallback((id: string) => {
+    setDevelopers(prev => prev.filter(d => d.id !== id));
+    // Unassign from projects
+    setProjects(prev => prev.map(p => p.assignedDeveloper === id ? { ...p, assignedDeveloper: undefined } : p));
+  }, []);
+
+  const updateDeveloper = useCallback((id: string, name: string) => {
+    setDevelopers(prev => prev.map(d => d.id === id ? { ...d, name } : d));
   }, []);
 
   const markNotificationRead = useCallback((notificationId: string) => {
@@ -111,7 +141,7 @@ export const CRMProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   }, [notifications]);
 
   return (
-    <CRMContext.Provider value={{ leads, projects, notifications, addLead, updateLeadStatus, assignLead, addLeadNote, addProject, deleteProject, updateProjectStatus, addProjectNote, assignDeveloper, markNotificationRead, getUnreadCount }}>
+    <CRMContext.Provider value={{ leads, projects, notifications, addLead, updateLeadStatus, assignLead, addLeadNote, addProject, deleteProject, updateProjectStatus, renameProject, setProjectDeadline, addProjectNote, assignDeveloper, markNotificationRead, getUnreadCount, developers, addDeveloper, removeDeveloper, updateDeveloper }}>
       {children}
     </CRMContext.Provider>
   );

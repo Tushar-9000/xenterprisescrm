@@ -1,26 +1,32 @@
 import { useState } from 'react';
+import { format } from 'date-fns';
 import { useAuth } from '@/context/AuthContext';
 import { useCRM } from '@/context/CRMContext';
-import { ProjectStatus, MOCK_DEVELOPERS } from '@/types/crm';
+import { ProjectStatus } from '@/types/crm';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar } from '@/components/ui/calendar';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
-import { Plus, Trash2, UserPlus } from 'lucide-react';
+import { Plus, Trash2, UserPlus, Pencil, CalendarIcon } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 const PROJECT_STATUSES: ProjectStatus[] = ['Planning', 'In Progress', 'Review', 'Completed', 'On Hold'];
 
 const Projects = () => {
   const { user } = useAuth();
-  const { projects, addProject, deleteProject, updateProjectStatus, addProjectNote, assignDeveloper } = useCRM();
+  const { projects, addProject, deleteProject, updateProjectStatus, addProjectNote, assignDeveloper, renameProject, setProjectDeadline, developers } = useCRM();
   const [noteOpen, setNoteOpen] = useState<string | null>(null);
   const [noteText, setNoteText] = useState('');
   const [addOpen, setAddOpen] = useState(false);
-  const [newProject, setNewProject] = useState({ clientName: '', clientEmail: '', clientPhone: '' });
+  const [newProject, setNewProject] = useState({ name: '', clientName: '', clientEmail: '', clientPhone: '' });
+  const [renameOpen, setRenameOpen] = useState<string | null>(null);
+  const [renameText, setRenameText] = useState('');
 
   if (!user) return null;
 
@@ -35,20 +41,35 @@ const Projects = () => {
   };
 
   const handleAddProject = () => {
-    if (!newProject.clientName.trim() || !newProject.clientEmail.trim()) {
-      toast.error('Please fill in client name and email');
+    if (!newProject.name.trim() || !newProject.clientName.trim() || !newProject.clientEmail.trim()) {
+      toast.error('Please fill in project name, client name and email');
       return;
     }
     addProject({
+      name: newProject.name,
       clientName: newProject.clientName,
       clientEmail: newProject.clientEmail,
       clientPhone: newProject.clientPhone,
       status: 'Planning',
       assignedTo: user.id,
     });
-    setNewProject({ clientName: '', clientEmail: '', clientPhone: '' });
+    setNewProject({ name: '', clientName: '', clientEmail: '', clientPhone: '' });
     setAddOpen(false);
     toast.success('Project created');
+  };
+
+  const handleRename = (projectId: string) => {
+    if (!renameText.trim()) return;
+    renameProject(projectId, renameText);
+    setRenameOpen(null);
+    setRenameText('');
+    toast.success('Project renamed');
+  };
+
+  const handleDeadline = (projectId: string, date: Date | undefined) => {
+    if (!date) return;
+    setProjectDeadline(projectId, date.toISOString());
+    toast.success('Deadline set');
   };
 
   const handleDelete = (projectId: string) => {
@@ -58,7 +79,7 @@ const Projects = () => {
 
   const handleAssignDeveloper = (projectId: string, developerId: string) => {
     assignDeveloper(projectId, developerId);
-    const dev = MOCK_DEVELOPERS.find(d => d.id === developerId);
+    const dev = developers.find(d => d.id === developerId);
     toast.success(`Assigned to ${dev?.name}`);
   };
 
@@ -77,6 +98,7 @@ const Projects = () => {
             <DialogContent className="bg-card border-border">
               <DialogHeader><DialogTitle>Create New Project</DialogTitle></DialogHeader>
               <div className="space-y-3">
+                <Input placeholder="Project Name *" value={newProject.name} onChange={e => setNewProject(p => ({ ...p, name: e.target.value }))} />
                 <Input placeholder="Client Name *" value={newProject.clientName} onChange={e => setNewProject(p => ({ ...p, clientName: e.target.value }))} />
                 <Input placeholder="Client Email *" type="email" value={newProject.clientEmail} onChange={e => setNewProject(p => ({ ...p, clientEmail: e.target.value }))} />
                 <Input placeholder="Client Phone" value={newProject.clientPhone} onChange={e => setNewProject(p => ({ ...p, clientPhone: e.target.value }))} />
@@ -96,16 +118,35 @@ const Projects = () => {
       ) : (
         <div className="grid gap-4">
           {projects.map((project) => {
-            const assignedDev = MOCK_DEVELOPERS.find(d => d.id === project.assignedDeveloper);
+            const assignedDev = developers.find(d => d.id === project.assignedDeveloper);
             return (
               <Card key={project.id} className="bg-card border-border">
                 <CardHeader className="flex flex-row items-center justify-between gap-4">
                   <div className="min-w-0">
-                    <CardTitle className="truncate">{project.clientName}</CardTitle>
-                    <p className="text-sm text-muted-foreground mt-1">{project.clientEmail} · {project.clientPhone}</p>
+                    <div className="flex items-center gap-2">
+                      <CardTitle className="truncate">{project.name}</CardTitle>
+                      {isTechLead && (
+                        <Dialog open={renameOpen === project.id} onOpenChange={(o) => { setRenameOpen(o ? project.id : null); if (o) setRenameText(project.name); }}>
+                          <DialogTrigger asChild>
+                            <Button size="icon" variant="ghost" className="h-7 w-7"><Pencil className="h-3.5 w-3.5" /></Button>
+                          </DialogTrigger>
+                          <DialogContent className="bg-card border-border">
+                            <DialogHeader><DialogTitle>Rename Project</DialogTitle></DialogHeader>
+                            <Input value={renameText} onChange={e => setRenameText(e.target.value)} placeholder="New project name" />
+                            <Button onClick={() => handleRename(project.id)}>Save</Button>
+                          </DialogContent>
+                        </Dialog>
+                      )}
+                    </div>
+                    <p className="text-sm text-muted-foreground mt-1">{project.clientName} · {project.clientEmail}</p>
                     {assignedDev && (
                       <p className="text-xs text-primary mt-1 flex items-center gap-1">
                         <UserPlus className="h-3 w-3" /> Developer: {assignedDev.name}
+                      </p>
+                    )}
+                    {project.deadline && (
+                      <p className="text-xs text-warning mt-1 flex items-center gap-1">
+                        <CalendarIcon className="h-3 w-3" /> Deadline: {format(new Date(project.deadline), 'PPP')}
                       </p>
                     )}
                   </div>
@@ -126,16 +167,37 @@ const Projects = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="flex flex-wrap gap-2 items-center">
-                    {/* Assign Developer */}
                     {isTechLead && (
-                      <Select value={project.assignedDeveloper || ''} onValueChange={(v) => handleAssignDeveloper(project.id, v)}>
-                        <SelectTrigger className="w-44 bg-secondary border-border">
-                          <SelectValue placeholder="Assign Developer" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {MOCK_DEVELOPERS.map(d => <SelectItem key={d.id} value={d.id}>{d.name}</SelectItem>)}
-                        </SelectContent>
-                      </Select>
+                      <>
+                        {/* Assign Developer */}
+                        <Select value={project.assignedDeveloper || ''} onValueChange={(v) => handleAssignDeveloper(project.id, v)}>
+                          <SelectTrigger className="w-44 bg-secondary border-border">
+                            <SelectValue placeholder="Assign Developer" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {developers.map(d => <SelectItem key={d.id} value={d.id}>{d.name}</SelectItem>)}
+                          </SelectContent>
+                        </Select>
+
+                        {/* Deadline Picker */}
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button variant="outline" size="sm" className={cn('gap-1', !project.deadline && 'text-muted-foreground')}>
+                              <CalendarIcon className="h-3.5 w-3.5" />
+                              {project.deadline ? format(new Date(project.deadline), 'PP') : 'Set Deadline'}
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0" align="start">
+                            <Calendar
+                              mode="single"
+                              selected={project.deadline ? new Date(project.deadline) : undefined}
+                              onSelect={(d) => handleDeadline(project.id, d)}
+                              initialFocus
+                              className={cn("p-3 pointer-events-auto")}
+                            />
+                          </PopoverContent>
+                        </Popover>
+                      </>
                     )}
 
                     {/* Notes */}
@@ -144,7 +206,7 @@ const Projects = () => {
                         <Button size="sm" variant="secondary">Notes ({project.notes.length})</Button>
                       </DialogTrigger>
                       <DialogContent className="bg-card border-border">
-                        <DialogHeader><DialogTitle>Project Notes - {project.clientName}</DialogTitle></DialogHeader>
+                        <DialogHeader><DialogTitle>Project Notes - {project.name}</DialogTitle></DialogHeader>
                         <div className="space-y-3 max-h-60 overflow-y-auto">
                           {project.notes.map(n => (
                             <div key={n.id} className="bg-secondary/50 rounded p-3 text-sm">
@@ -175,7 +237,7 @@ const Projects = () => {
                         <AlertDialogContent className="bg-card border-border">
                           <AlertDialogHeader>
                             <AlertDialogTitle>Delete Project</AlertDialogTitle>
-                            <AlertDialogDescription>Are you sure you want to delete "{project.clientName}"? This cannot be undone.</AlertDialogDescription>
+                            <AlertDialogDescription>Are you sure you want to delete "{project.name}"? This cannot be undone.</AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
                             <AlertDialogCancel>Cancel</AlertDialogCancel>
