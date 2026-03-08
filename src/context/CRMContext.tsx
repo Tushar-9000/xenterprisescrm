@@ -12,8 +12,14 @@ interface CRMContextType {
   addProject: (project: Omit<Project, 'id' | 'notes' | 'createdAt' | 'updatedAt'>) => void;
   deleteProject: (projectId: string) => void;
   updateProjectStatus: (projectId: string, status: ProjectStatus) => void;
+  renameProject: (projectId: string, name: string) => void;
+  setProjectDeadline: (projectId: string, deadline: string) => void;
   addProjectNote: (projectId: string, note: Omit<Note, 'id' | 'createdAt'>) => void;
   assignDeveloper: (projectId: string, developerId: string) => void;
+  developers: Developer[];
+  addDeveloper: (name: string) => void;
+  removeDeveloper: (id: string) => void;
+  updateDeveloper: (id: string, name: string) => void;
   markNotificationRead: (notificationId: string) => void;
   getUnreadCount: (userId: string) => number;
 }

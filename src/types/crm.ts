@@ -36,6 +36,7 @@ export type ProjectStatus = 'Planning' | 'In Progress' | 'Review' | 'Completed' 
 
 export interface Project {
   id: string;
+  name: string;
   leadId?: string;
   clientName: string;
   clientEmail: string;
@@ -43,6 +44,7 @@ export interface Project {
   status: ProjectStatus;
   assignedTo: string;
   assignedDeveloper?: string;
+  deadline?: string;
   notes: Note[];
   createdAt: string;
   updatedAt: string;
