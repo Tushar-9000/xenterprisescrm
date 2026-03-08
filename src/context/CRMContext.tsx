@@ -131,6 +131,8 @@ export const CRMProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   }, []);
 
   const assignLead = useCallback((leadId: string, userId: string) => {
+    const lead = leads.find(l => l.id === leadId);
+    const assignee = users.find(u => u.id === userId);
     setLeads(prev => prev.map(l => l.id === leadId ? { ...l, assignedTo: userId, updatedAt: new Date().toISOString() } : l));
     addNotification({ title: 'New Lead Assigned', message: `A new lead has been assigned to you`, type: 'assignment', userId });
   }, []);
