@@ -111,7 +111,7 @@ export const CRMProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   }, [notifications]);
 
   return (
-    <CRMContext.Provider value={{ leads, projects, notifications, addLead, updateLeadStatus, assignLead, addLeadNote, updateProjectStatus, addProjectNote, markNotificationRead, getUnreadCount }}>
+    <CRMContext.Provider value={{ leads, projects, notifications, addLead, updateLeadStatus, assignLead, addLeadNote, addProject, deleteProject, updateProjectStatus, addProjectNote, assignDeveloper, markNotificationRead, getUnreadCount }}>
       {children}
     </CRMContext.Provider>
   );
