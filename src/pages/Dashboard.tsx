@@ -446,7 +446,7 @@ const StatusBadge = ({ status }: { status: string }) => {
 
 const Dashboard = () => {
   const { user } = useAuth();
-  const { leads, projects, notifications } = useCRM();
+  const { leads, projects, notifications, activities } = useCRM();
 
   if (!user) return null;
 
@@ -457,7 +457,7 @@ const Dashboard = () => {
         <p className="text-muted-foreground mt-1">{ROLE_LABELS[user.role]} Dashboard</p>
       </div>
 
-      {user.role === 'admin' && <AdminDashboard leads={leads} projects={projects} notifications={notifications} />}
+      {user.role === 'admin' && <AdminDashboard leads={leads} projects={projects} notifications={notifications} activities={activities} />}
       {user.role === 'sales_manager' && <SalesManagerDashboard leads={leads} />}
       {user.role === 'telecaller' && <TelecallerDashboard leads={leads} userId={user.id} />}
       {user.role === 'tech_lead' && <TechLeadDashboard projects={projects} />}
