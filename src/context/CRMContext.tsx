@@ -102,12 +102,34 @@ export const CRMProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setProjects(prev => prev.map(p => p.id === projectId ? { ...p, status, updatedAt: new Date().toISOString() } : p));
   }, []);
 
+  const renameProject = useCallback((projectId: string, name: string) => {
+    setProjects(prev => prev.map(p => p.id === projectId ? { ...p, name, updatedAt: new Date().toISOString() } : p));
+  }, []);
+
+  const setProjectDeadline = useCallback((projectId: string, deadline: string) => {
+    setProjects(prev => prev.map(p => p.id === projectId ? { ...p, deadline, updatedAt: new Date().toISOString() } : p));
+  }, []);
+
   const addProjectNote = useCallback((projectId: string, note: Omit<Note, 'id' | 'createdAt'>) => {
     setProjects(prev => prev.map(p => p.id === projectId ? { ...p, notes: [...p.notes, { ...note, id: `n-${Date.now()}`, createdAt: new Date().toISOString() }], updatedAt: new Date().toISOString() } : p));
   }, []);
 
   const assignDeveloper = useCallback((projectId: string, developerId: string) => {
     setProjects(prev => prev.map(p => p.id === projectId ? { ...p, assignedDeveloper: developerId, updatedAt: new Date().toISOString() } : p));
+  }, []);
+
+  const addDeveloper = useCallback((name: string) => {
+    setDevelopers(prev => [...prev, { id: `d-${Date.now()}`, name }]);
+  }, []);
+
+  const removeDeveloper = useCallback((id: string) => {
+    setDevelopers(prev => prev.filter(d => d.id !== id));
+    // Unassign from projects
+    setProjects(prev => prev.map(p => p.assignedDeveloper === id ? { ...p, assignedDeveloper: undefined } : p));
+  }, []);
+
+  const updateDeveloper = useCallback((id: string, name: string) => {
+    setDevelopers(prev => prev.map(d => d.id === id ? { ...d, name } : d));
   }, []);
 
   const markNotificationRead = useCallback((notificationId: string) => {
