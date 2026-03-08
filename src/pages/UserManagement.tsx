@@ -32,6 +32,8 @@ const UserManagement = () => {
 
   const handleEdit = () => {
     if (!editUserId) return;
+    if (!isValidEmail(editData.email)) { toast.error('Please enter a valid email'); return; }
+    if (editData.phone && !isValidPhone(editData.phone)) { toast.error('Please enter a valid phone number'); return; }
     updateUser(editUserId, editData);
     setEditUserId(null);
     toast.success('User updated');
