@@ -371,6 +371,7 @@ const Leads = () => {
         isTelecaller={false}
         onEdit={(lead) => { setEditLeadId(lead.id); setEditLeadData({ name: lead.name, email: lead.email, phone: lead.phone, company: lead.company || '', source: lead.source || '' }); }}
         onDelete={(id) => { deleteLead(id); toast.success('Lead deleted'); }}
+        onConvert={(lead) => { setConvertLead(lead); setProjectDetails({ projectName: `${lead.name} Project`, description: '' }); }}
       />
 
       {/* Edit Lead Dialog */}
