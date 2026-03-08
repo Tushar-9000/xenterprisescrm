@@ -83,7 +83,8 @@ export const CRMProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setFolders(prev => prev.filter(f => f.id !== folderId));
     setLeads(prev => prev.filter(l => l.folderId !== folderId));
     addActivity('folder_deleted', 'Folder Deleted', `Folder "${folder?.name || folderId}" deleted`);
-  }, [folders]);
+    notifyByRole(['admin', 'sales_manager'], 'Folder Deleted', `Folder "${folder?.name || folderId}" was deleted`);
+  }, [folders, users]);
 
   const renameFolder = useCallback((folderId: string, name: string) => {
     setFolders(prev => prev.map(f => f.id === folderId ? { ...f, name } : f));
@@ -94,7 +95,8 @@ export const CRMProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const now = new Date().toISOString();
     setLeads(prev => [...prev, { ...lead, id: `l-${Date.now()}`, notes: [], createdAt: now, updatedAt: now }]);
     addActivity('lead_added', 'Lead Added', `New lead "${lead.name}" from ${lead.source || 'unknown source'}`);
-  }, []);
+    notifyByRole(['admin', 'sales_manager'], 'New Lead Added', `"${lead.name}" added from ${lead.source || 'unknown source'}`);
+  }, [users]);
 
   const updateLead = useCallback((leadId: string, data: Partial<Pick<Lead, 'name' | 'email' | 'phone' | 'company' | 'source'>>) => {
     setLeads(prev => prev.map(l => l.id === leadId ? { ...l, ...data, updatedAt: new Date().toISOString() } : l));
@@ -104,7 +106,8 @@ export const CRMProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const lead = leads.find(l => l.id === leadId);
     setLeads(prev => prev.filter(l => l.id !== leadId));
     addActivity('lead_deleted', 'Lead Deleted', `Lead "${lead?.name || leadId}" removed`);
-  }, [leads]);
+    notifyByRole(['admin', 'sales_manager'], 'Lead Deleted', `Lead "${lead?.name || leadId}" was removed`);
+  }, [leads, users]);
 
   const updateLeadStatus = useCallback((leadId: string, status: LeadStatus, userId: string) => {
     setLeads(prev => prev.map(l => {
