@@ -2,7 +2,7 @@ import { useState, useRef } from 'react';
 import { isValidEmail, isValidPhone, sanitizePhone } from '@/lib/validation';
 import { useAuth } from '@/context/AuthContext';
 import { useCRM } from '@/context/CRMContext';
-import { LeadStatus } from '@/types/crm';
+import { LeadStatus, Lead } from '@/types/crm';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -17,7 +17,7 @@ const STATUSES: LeadStatus[] = ['New', 'Contacted', 'Follow-up', 'Interested', '
 
 const Leads = () => {
   const { user } = useAuth();
-  const { leads, folders, addFolder, deleteFolder, renameFolder, addLead, updateLead, deleteLead, updateLeadStatus, assignLead, addLeadNote } = useCRM();
+  const { leads, folders, addFolder, deleteFolder, renameFolder, addLead, updateLead, deleteLead, updateLeadStatus, assignLead, addLeadNote, addProjectRequest } = useCRM();
   const { users } = useCRM();
 
   const [selectedFolder, setSelectedFolder] = useState<string | null>(null);
@@ -35,6 +35,10 @@ const Leads = () => {
   const [newLead, setNewLead] = useState({ name: '', email: '', phone: '', company: '', source: '' });
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [telecallerFolder, setTelecallerFolder] = useState<string | null>(null);
+
+  // Project request dialog state
+  const [convertLead, setConvertLead] = useState<Lead | null>(null);
+  const [projectDetails, setProjectDetails] = useState({ projectName: '', description: '' });
 
   if (!user) return null;
 
