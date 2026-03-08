@@ -12,13 +12,6 @@ import { toast } from 'sonner';
 import { Phone, FolderKanban, Users, TrendingUp, Clock, CheckCircle, ArrowUpRight, ArrowDownRight, Activity, BarChart3, Target, UserCheck, PhoneCall, CalendarCheck, Plus, Trash2, Pencil, Code2 } from 'lucide-react';
 
 const AdminDashboard = ({ leads, projects, notifications }: { leads: any[]; projects: any[]; notifications: any[] }) => {
-  const { developers, addDeveloper, removeDeveloper, updateDeveloper, assignDeveloper } = useCRM();
-  const [newDevName, setNewDevName] = useState('');
-  const [addDevOpen, setAddDevOpen] = useState(false);
-  const [editDevId, setEditDevId] = useState<string | null>(null);
-  const [editDevName, setEditDevName] = useState('');
-  const [reassignOpen, setReassignOpen] = useState<string | null>(null);
-
   const converted = leads.filter(l => l.status === 'Converted').length;
   const conversionRate = leads.length > 0 ? Math.round((converted / leads.length) * 100) : 0;
   const assignedLeads = leads.filter(l => l.assignedTo).length;
