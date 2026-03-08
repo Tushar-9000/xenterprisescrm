@@ -157,6 +157,8 @@ const Leads = () => {
 
   const handleUpdateLead = () => {
     if (!editLeadId) return;
+    if (editLeadData.email && !isValidEmail(editLeadData.email)) { toast.error('Please enter a valid email'); return; }
+    if (editLeadData.phone && !isValidPhone(editLeadData.phone)) { toast.error('Please enter a valid phone number'); return; }
     updateLead(editLeadId, editLeadData);
     setEditLeadId(null);
     toast.success('Lead updated');
