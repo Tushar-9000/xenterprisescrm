@@ -43,6 +43,7 @@ export const CRMProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [leads, setLeads] = useState<Lead[]>(INITIAL_LEADS);
   const [projects, setProjects] = useState<Project[]>([]);
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [developers, setDevelopers] = useState<Developer[]>(MOCK_DEVELOPERS);
 
   const addNotification = (n: Omit<Notification, 'id' | 'read' | 'createdAt'>) => {
     setNotifications(prev => [...prev, { ...n, id: `notif-${Date.now()}`, read: false, createdAt: new Date().toISOString() }]);
