@@ -70,6 +70,7 @@ export const CRMProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   // Folder CRUD
   const addFolder = useCallback((name: string, location: string) => {
     setFolders(prev => [...prev, { id: `f-${Date.now()}`, name, location, createdAt: new Date().toISOString() }]);
+    addActivity('folder_added', 'Folder Created', `Folder "${name}" created at ${location}`);
   }, []);
 
   const deleteFolder = useCallback((folderId: string) => {
