@@ -74,9 +74,11 @@ export const CRMProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   }, []);
 
   const deleteFolder = useCallback((folderId: string) => {
+    const folder = folders.find(f => f.id === folderId);
     setFolders(prev => prev.filter(f => f.id !== folderId));
     setLeads(prev => prev.filter(l => l.folderId !== folderId));
-  }, []);
+    addActivity('folder_deleted', 'Folder Deleted', `Folder "${folder?.name || folderId}" deleted`);
+  }, [folders]);
 
   const renameFolder = useCallback((folderId: string, name: string) => {
     setFolders(prev => prev.map(f => f.id === folderId ? { ...f, name } : f));
