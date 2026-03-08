@@ -16,6 +16,7 @@ import UserManagement from "./pages/UserManagement";
 import DeveloperManagement from "./pages/DeveloperManagement";
 import LeadStatus from "./pages/LeadStatus";
 import SettingsPage from "./pages/SettingsPage";
+import ProjectRequests from "./pages/ProjectRequests";
 import Profile from "./pages/Profile";
 import AppLayout from "./components/layout/AppLayout";
 import NotFound from "./pages/NotFound";
