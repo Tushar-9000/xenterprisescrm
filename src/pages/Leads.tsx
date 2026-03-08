@@ -494,14 +494,27 @@ const LeadTable = ({ leads, user, isManager, isTelecaller, onEdit, onDelete, onC
                   <td className="py-3 px-4 text-muted-foreground">{lead.company || '—'}</td>
                   <td className="py-3 px-4">
                     {(isTelecaller || isManager) && lead.status !== 'Converted' ? (
-                      <Select value={lead.status} onValueChange={(v) => updateLeadStatus(lead.id, v as LeadStatus, user.id)}>
-                        <SelectTrigger className="w-32 h-8 text-xs bg-secondary border-border">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {STATUSES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
-                        </SelectContent>
-                      </Select>
+                      <div className="flex items-center gap-1">
+                        <Select value={lead.status} onValueChange={(v) => {
+                          if (v === 'Converted') {
+                            if (onConvert) onConvert(lead);
+                            return;
+                          }
+                          updateLeadStatus(lead.id, v as LeadStatus, user.id);
+                        }}>
+                          <SelectTrigger className="w-32 h-8 text-xs bg-secondary border-border">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {STATUSES.filter(s => s !== 'Converted').map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                          </SelectContent>
+                        </Select>
+                        {lead.status === 'Interested' && onConvert && (
+                          <Button size="sm" variant="default" className="h-8 text-xs" onClick={() => onConvert(lead)}>
+                            Convert
+                          </Button>
+                        )}
+                      </div>
                     ) : (
                       <StatusBadge status={lead.status} />
                     )}
