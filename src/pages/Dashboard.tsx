@@ -1,15 +1,8 @@
-import { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useCRM } from '@/context/CRMContext';
 import { ROLE_LABELS, MOCK_USERS } from '@/types/crm';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-import { toast } from 'sonner';
-import { Phone, FolderKanban, Users, TrendingUp, Clock, CheckCircle, ArrowUpRight, ArrowDownRight, Activity, BarChart3, Target, UserCheck, PhoneCall, CalendarCheck, Plus, Trash2, Pencil, Code2 } from 'lucide-react';
+import { Phone, FolderKanban, Users, TrendingUp, Clock, CheckCircle, ArrowUpRight, ArrowDownRight, Activity, BarChart3, Target, UserCheck, PhoneCall, CalendarCheck } from 'lucide-react';
 
 const AdminDashboard = ({ leads, projects, notifications }: { leads: any[]; projects: any[]; notifications: any[] }) => {
   const converted = leads.filter(l => l.status === 'Converted').length;
