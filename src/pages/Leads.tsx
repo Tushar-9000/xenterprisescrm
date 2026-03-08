@@ -442,13 +442,14 @@ const Leads = () => {
 };
 
 // Shared Lead Table
-const LeadTable = ({ leads, user, isManager, isTelecaller, onEdit, onDelete }: {
+const LeadTable = ({ leads, user, isManager, isTelecaller, onEdit, onDelete, onConvert }: {
   leads: any[];
   user: any;
   isManager: boolean;
   isTelecaller: boolean;
   onEdit?: (lead: any) => void;
   onDelete?: (id: string) => void;
+  onConvert?: (lead: any) => void;
 }) => {
   const { updateLeadStatus, assignLead, addLeadNote, users } = useCRM();
   const [noteOpen, setNoteOpen] = useState<string | null>(null);
