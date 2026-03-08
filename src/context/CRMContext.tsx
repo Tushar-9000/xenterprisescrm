@@ -9,8 +9,11 @@ interface CRMContextType {
   updateLeadStatus: (leadId: string, status: LeadStatus, userId: string) => void;
   assignLead: (leadId: string, userId: string) => void;
   addLeadNote: (leadId: string, note: Omit<Note, 'id' | 'createdAt'>) => void;
+  addProject: (project: Omit<Project, 'id' | 'notes' | 'createdAt' | 'updatedAt'>) => void;
+  deleteProject: (projectId: string) => void;
   updateProjectStatus: (projectId: string, status: ProjectStatus) => void;
   addProjectNote: (projectId: string, note: Omit<Note, 'id' | 'createdAt'>) => void;
+  assignDeveloper: (projectId: string, developerId: string) => void;
   markNotificationRead: (notificationId: string) => void;
   getUnreadCount: (userId: string) => number;
 }
