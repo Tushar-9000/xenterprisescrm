@@ -13,6 +13,7 @@ import Notifications from "./pages/Notifications";
 import Leaderboard from "./pages/Leaderboard";
 import UserManagement from "./pages/UserManagement";
 import DeveloperManagement from "./pages/DeveloperManagement";
+import LeadStatus from "./pages/LeadStatus";
 import SettingsPage from "./pages/SettingsPage";
 import AppLayout from "./components/layout/AppLayout";
 import NotFound from "./pages/NotFound";
@@ -39,6 +40,7 @@ const AppRoutes = () => {
         <Route path="/notifications" element={<Notifications />} />
         <Route path="/leaderboard" element={<Leaderboard />} />
         <Route path="/developers" element={<DeveloperManagement />} />
+        <Route path="/lead-status" element={<LeadStatus />} />
         <Route path="/users" element={<UserManagement />} />
         <Route path="/settings" element={<SettingsPage />} />
       </Route>
