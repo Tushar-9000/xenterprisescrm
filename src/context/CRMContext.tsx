@@ -1,8 +1,9 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
-import { Lead, Project, Notification, Note, LeadStatus, ProjectStatus, Developer, LeadFolder, User, MOCK_DEVELOPERS, MOCK_USERS } from '@/types/crm';
+import { Lead, Project, Notification, Note, LeadStatus, ProjectStatus, Developer, LeadFolder, User, Activity, MOCK_DEVELOPERS, MOCK_USERS } from '@/types/crm';
 
 interface CRMContextType {
   leads: Lead[];
+  activities: Activity[];
   projects: Project[];
   notifications: Notification[];
   folders: LeadFolder[];
@@ -56,6 +57,11 @@ export const CRMProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [developers, setDevelopers] = useState<Developer[]>(MOCK_DEVELOPERS);
   const [folders, setFolders] = useState<LeadFolder[]>([]);
   const [users, setUsers] = useState<User[]>(MOCK_USERS);
+  const [activities, setActivities] = useState<Activity[]>([]);
+
+  const addActivity = (type: Activity['type'], title: string, description: string, userId?: string) => {
+    setActivities(prev => [{ id: `act-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`, type, title, description, userId, createdAt: new Date().toISOString() }, ...prev]);
+  };
 
   const addNotification = (n: Omit<Notification, 'id' | 'read' | 'createdAt'>) => {
     setNotifications(prev => [...prev, { ...n, id: `notif-${Date.now()}`, read: false, createdAt: new Date().toISOString() }]);
@@ -64,12 +70,15 @@ export const CRMProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   // Folder CRUD
   const addFolder = useCallback((name: string, location: string) => {
     setFolders(prev => [...prev, { id: `f-${Date.now()}`, name, location, createdAt: new Date().toISOString() }]);
+    addActivity('folder_added', 'Folder Created', `Folder "${name}" created at ${location}`);
   }, []);
 
   const deleteFolder = useCallback((folderId: string) => {
+    const folder = folders.find(f => f.id === folderId);
     setFolders(prev => prev.filter(f => f.id !== folderId));
     setLeads(prev => prev.filter(l => l.folderId !== folderId));
-  }, []);
+    addActivity('folder_deleted', 'Folder Deleted', `Folder "${folder?.name || folderId}" deleted`);
+  }, [folders]);
 
   const renameFolder = useCallback((folderId: string, name: string) => {
     setFolders(prev => prev.map(f => f.id === folderId ? { ...f, name } : f));
@@ -79,6 +88,7 @@ export const CRMProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const addLead = useCallback((lead: Omit<Lead, 'id' | 'notes' | 'createdAt' | 'updatedAt'>) => {
     const now = new Date().toISOString();
     setLeads(prev => [...prev, { ...lead, id: `l-${Date.now()}`, notes: [], createdAt: now, updatedAt: now }]);
+    addActivity('lead_added', 'Lead Added', `New lead "${lead.name}" from ${lead.source || 'unknown source'}`);
   }, []);
 
   const updateLead = useCallback((leadId: string, data: Partial<Pick<Lead, 'name' | 'email' | 'phone' | 'company' | 'source'>>) => {
@@ -86,8 +96,10 @@ export const CRMProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   }, []);
 
   const deleteLead = useCallback((leadId: string) => {
+    const lead = leads.find(l => l.id === leadId);
     setLeads(prev => prev.filter(l => l.id !== leadId));
-  }, []);
+    addActivity('lead_deleted', 'Lead Deleted', `Lead "${lead?.name || leadId}" removed`);
+  }, [leads]);
 
   const updateLeadStatus = useCallback((leadId: string, status: LeadStatus, userId: string) => {
     setLeads(prev => prev.map(l => {
@@ -110,15 +122,21 @@ export const CRMProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         setProjects(prev => [...prev, newProject]);
         addNotification({ title: 'Lead Converted', message: `${l.name} has been converted to a project`, type: 'conversion', userId: '2' });
         addNotification({ title: 'Lead Converted', message: `${l.name} has been converted to a project`, type: 'conversion', userId: '1' });
+        addActivity('lead_status_changed', 'Lead Converted', `"${l.name}" converted to project`, userId);
+      } else {
+        addActivity('lead_status_changed', 'Lead Status Updated', `"${l.name}" status changed to ${status}`, userId);
       }
       return updated;
     }));
   }, []);
 
   const assignLead = useCallback((leadId: string, userId: string) => {
+    const lead = leads.find(l => l.id === leadId);
+    const assignee = users.find(u => u.id === userId);
     setLeads(prev => prev.map(l => l.id === leadId ? { ...l, assignedTo: userId, updatedAt: new Date().toISOString() } : l));
     addNotification({ title: 'New Lead Assigned', message: `A new lead has been assigned to you`, type: 'assignment', userId });
-  }, []);
+    addActivity('lead_assigned', 'Lead Assigned', `"${lead?.name || leadId}" assigned to ${assignee?.name || userId}`, userId);
+  }, [leads, users]);
 
   const addLeadNote = useCallback((leadId: string, note: Omit<Note, 'id' | 'createdAt'>) => {
     setLeads(prev => prev.map(l => l.id === leadId ? { ...l, notes: [...l.notes, { ...note, id: `n-${Date.now()}`, createdAt: new Date().toISOString() }], updatedAt: new Date().toISOString() } : l));
@@ -127,15 +145,20 @@ export const CRMProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const addProject = useCallback((project: Omit<Project, 'id' | 'notes' | 'createdAt' | 'updatedAt'>) => {
     const now = new Date().toISOString();
     setProjects(prev => [...prev, { ...project, id: `p-${Date.now()}`, notes: [], createdAt: now, updatedAt: now }]);
+    addActivity('project_added', 'Project Created', `New project "${project.name}" for ${project.clientName}`);
   }, []);
 
   const deleteProject = useCallback((projectId: string) => {
+    const project = projects.find(p => p.id === projectId);
     setProjects(prev => prev.filter(p => p.id !== projectId));
-  }, []);
+    addActivity('project_deleted', 'Project Deleted', `Project "${project?.name || projectId}" removed`);
+  }, [projects]);
 
   const updateProjectStatus = useCallback((projectId: string, status: ProjectStatus) => {
+    const project = projects.find(p => p.id === projectId);
     setProjects(prev => prev.map(p => p.id === projectId ? { ...p, status, updatedAt: new Date().toISOString() } : p));
-  }, []);
+    addActivity('project_status_changed', 'Project Status Updated', `"${project?.name || projectId}" status changed to ${status}`);
+  }, [projects]);
 
   const renameProject = useCallback((projectId: string, name: string) => {
     setProjects(prev => prev.map(p => p.id === projectId ? { ...p, name, updatedAt: new Date().toISOString() } : p));
@@ -189,7 +212,7 @@ export const CRMProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   return (
     <CRMContext.Provider value={{
-      leads, projects, notifications, folders, users,
+      leads, projects, notifications, folders, users, activities,
       addFolder, deleteFolder, renameFolder,
       addLead, updateLead, deleteLead, updateLeadStatus, assignLead, addLeadNote,
       addProject, deleteProject, updateProjectStatus, renameProject, setProjectDeadline, addProjectNote, assignDeveloper,

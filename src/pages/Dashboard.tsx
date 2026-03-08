@@ -1,10 +1,49 @@
 import { useAuth } from '@/context/AuthContext';
 import { useCRM } from '@/context/CRMContext';
-import { ROLE_LABELS, MOCK_USERS } from '@/types/crm';
+import { ROLE_LABELS, MOCK_USERS, Activity } from '@/types/crm';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Phone, FolderKanban, Users, TrendingUp, Clock, CheckCircle, ArrowUpRight, ArrowDownRight, Activity, BarChart3, Target, UserCheck, PhoneCall, CalendarCheck } from 'lucide-react';
+import { Phone, FolderKanban, Users, TrendingUp, Clock, CheckCircle, ArrowUpRight, ArrowDownRight, Activity as ActivityIcon, BarChart3, Target, UserCheck, PhoneCall, CalendarCheck, UserPlus, Trash2, FileText, GitBranch } from 'lucide-react';
 
-const AdminDashboard = ({ leads, projects, notifications }: { leads: any[]; projects: any[]; notifications: any[] }) => {
+const ACTIVITY_ICONS: Record<string, any> = {
+  lead_added: UserPlus,
+  lead_deleted: Trash2,
+  lead_status_changed: GitBranch,
+  lead_assigned: UserCheck,
+  lead_note_added: FileText,
+  project_added: FolderKanban,
+  project_deleted: Trash2,
+  project_status_changed: GitBranch,
+  project_renamed: FileText,
+  developer_assigned: UserCheck,
+  folder_added: FolderKanban,
+  folder_deleted: Trash2,
+  user_added: UserPlus,
+  user_removed: Trash2,
+};
+
+const ACTIVITY_COLORS: Record<string, string> = {
+  lead_added: 'bg-success/20 text-success',
+  lead_deleted: 'bg-destructive/20 text-destructive',
+  lead_status_changed: 'bg-info/20 text-info',
+  lead_assigned: 'bg-primary/20 text-primary',
+  project_added: 'bg-success/20 text-success',
+  project_deleted: 'bg-destructive/20 text-destructive',
+  project_status_changed: 'bg-warning/20 text-warning',
+  folder_added: 'bg-primary/20 text-primary',
+  folder_deleted: 'bg-destructive/20 text-destructive',
+};
+
+const formatTimeAgo = (dateStr: string) => {
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return 'Just now';
+  if (mins < 60) return `${mins}m ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}h ago`;
+  return `${Math.floor(hrs / 24)}d ago`;
+};
+
+const AdminDashboard = ({ leads, projects, notifications, activities }: { leads: any[]; projects: any[]; notifications: any[]; activities: Activity[] }) => {
   const converted = leads.filter(l => l.status === 'Converted').length;
   const conversionRate = leads.length > 0 ? Math.round((converted / leads.length) * 100) : 0;
   const assignedLeads = leads.filter(l => l.assignedTo).length;
@@ -113,7 +152,7 @@ const AdminDashboard = ({ leads, projects, notifications }: { leads: any[]; proj
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <Card className="bg-card border-border">
           <CardHeader className="pb-3">
-            <CardTitle className="text-lg flex items-center gap-2"><Activity className="h-4 w-4 text-primary" /> Recent Leads</CardTitle>
+            <CardTitle className="text-lg flex items-center gap-2"><ActivityIcon className="h-4 w-4 text-primary" /> Recent Leads</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
@@ -153,6 +192,37 @@ const AdminDashboard = ({ leads, projects, notifications }: { leads: any[]; proj
           </CardContent>
         </Card>
       </div>
+
+      {/* Recent Activities */}
+      <Card className="bg-card border-border">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-lg flex items-center gap-2"><ActivityIcon className="h-4 w-4 text-primary" /> Recent Activities</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {activities.length === 0 ? (
+            <p className="text-sm text-muted-foreground text-center py-8">No activities yet. Actions across the CRM will appear here.</p>
+          ) : (
+            <div className="space-y-1">
+              {activities.slice(0, 15).map(activity => {
+                const Icon = ACTIVITY_ICONS[activity.type] || ActivityIcon;
+                const colorClass = ACTIVITY_COLORS[activity.type] || 'bg-secondary text-muted-foreground';
+                return (
+                  <div key={activity.id} className="flex items-start gap-3 p-3 rounded-lg hover:bg-secondary/20 transition-colors">
+                    <div className={`h-8 w-8 rounded-full flex items-center justify-center shrink-0 mt-0.5 ${colorClass}`}>
+                      <Icon className="h-3.5 w-3.5" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium">{activity.title}</p>
+                      <p className="text-xs text-muted-foreground truncate">{activity.description}</p>
+                    </div>
+                    <span className="text-xs text-muted-foreground whitespace-nowrap shrink-0">{formatTimeAgo(activity.createdAt)}</span>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 };
@@ -313,7 +383,7 @@ const TechLeadDashboard = ({ projects }: { projects: any[] }) => {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         {[
           { label: 'Total Projects', value: projects.length, icon: FolderKanban },
-          { label: 'In Progress', value: active, icon: Activity },
+          { label: 'In Progress', value: active, icon: ActivityIcon },
           { label: 'Planning', value: planning, icon: Clock },
           { label: 'Completed', value: completed, icon: CheckCircle },
         ].map((s, i) => (
@@ -376,7 +446,7 @@ const StatusBadge = ({ status }: { status: string }) => {
 
 const Dashboard = () => {
   const { user } = useAuth();
-  const { leads, projects, notifications } = useCRM();
+  const { leads, projects, notifications, activities } = useCRM();
 
   if (!user) return null;
 
@@ -387,7 +457,7 @@ const Dashboard = () => {
         <p className="text-muted-foreground mt-1">{ROLE_LABELS[user.role]} Dashboard</p>
       </div>
 
-      {user.role === 'admin' && <AdminDashboard leads={leads} projects={projects} notifications={notifications} />}
+      {user.role === 'admin' && <AdminDashboard leads={leads} projects={projects} notifications={notifications} activities={activities} />}
       {user.role === 'sales_manager' && <SalesManagerDashboard leads={leads} />}
       {user.role === 'telecaller' && <TelecallerDashboard leads={leads} userId={user.id} />}
       {user.role === 'tech_lead' && <TechLeadDashboard projects={projects} />}

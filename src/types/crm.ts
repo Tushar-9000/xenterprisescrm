@@ -70,6 +70,17 @@ export interface Notification {
   createdAt: string;
 }
 
+export type ActivityType = 'lead_added' | 'lead_updated' | 'lead_deleted' | 'lead_status_changed' | 'lead_assigned' | 'lead_note_added' | 'project_added' | 'project_deleted' | 'project_status_changed' | 'project_renamed' | 'project_deadline_set' | 'developer_assigned' | 'developer_added' | 'developer_removed' | 'user_added' | 'user_removed' | 'folder_added' | 'folder_deleted';
+
+export interface Activity {
+  id: string;
+  type: ActivityType;
+  title: string;
+  description: string;
+  userId?: string;
+  createdAt: string;
+}
+
 export const ROLE_LABELS: Record<UserRole, string> = {
   admin: 'Super Admin',
   tech_lead: 'Tech Lead',
