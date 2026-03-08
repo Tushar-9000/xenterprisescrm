@@ -22,6 +22,8 @@ const UserManagement = () => {
 
   const handleAdd = () => {
     if (!newUser.name || !newUser.email) { toast.error('Name and email are required'); return; }
+    if (!isValidEmail(newUser.email)) { toast.error('Please enter a valid email'); return; }
+    if (newUser.phone && !isValidPhone(newUser.phone)) { toast.error('Please enter a valid phone number'); return; }
     addUser({ ...newUser, joiningDate: newUser.joiningDate || new Date().toISOString().split('T')[0] });
     setNewUser({ name: '', email: '', phone: '', role: 'telecaller', joiningDate: '' });
     setAddOpen(false);
