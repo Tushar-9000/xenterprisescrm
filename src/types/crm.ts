@@ -36,12 +36,13 @@ export type ProjectStatus = 'Planning' | 'In Progress' | 'Review' | 'Completed' 
 
 export interface Project {
   id: string;
-  leadId: string;
+  leadId?: string;
   clientName: string;
   clientEmail: string;
   clientPhone: string;
   status: ProjectStatus;
   assignedTo: string;
+  assignedDeveloper?: string;
   notes: Note[];
   createdAt: string;
   updatedAt: string;
