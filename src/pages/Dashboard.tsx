@@ -4,7 +4,46 @@ import { ROLE_LABELS, MOCK_USERS, Activity } from '@/types/crm';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Phone, FolderKanban, Users, TrendingUp, Clock, CheckCircle, ArrowUpRight, ArrowDownRight, Activity as ActivityIcon, BarChart3, Target, UserCheck, PhoneCall, CalendarCheck, UserPlus, Trash2, FileText, GitBranch } from 'lucide-react';
 
-const AdminDashboard = ({ leads, projects, notifications }: { leads: any[]; projects: any[]; notifications: any[] }) => {
+const ACTIVITY_ICONS: Record<string, any> = {
+  lead_added: UserPlus,
+  lead_deleted: Trash2,
+  lead_status_changed: GitBranch,
+  lead_assigned: UserCheck,
+  lead_note_added: FileText,
+  project_added: FolderKanban,
+  project_deleted: Trash2,
+  project_status_changed: GitBranch,
+  project_renamed: FileText,
+  developer_assigned: UserCheck,
+  folder_added: FolderKanban,
+  folder_deleted: Trash2,
+  user_added: UserPlus,
+  user_removed: Trash2,
+};
+
+const ACTIVITY_COLORS: Record<string, string> = {
+  lead_added: 'bg-success/20 text-success',
+  lead_deleted: 'bg-destructive/20 text-destructive',
+  lead_status_changed: 'bg-info/20 text-info',
+  lead_assigned: 'bg-primary/20 text-primary',
+  project_added: 'bg-success/20 text-success',
+  project_deleted: 'bg-destructive/20 text-destructive',
+  project_status_changed: 'bg-warning/20 text-warning',
+  folder_added: 'bg-primary/20 text-primary',
+  folder_deleted: 'bg-destructive/20 text-destructive',
+};
+
+const formatTimeAgo = (dateStr: string) => {
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return 'Just now';
+  if (mins < 60) return `${mins}m ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}h ago`;
+  return `${Math.floor(hrs / 24)}d ago`;
+};
+
+const AdminDashboard = ({ leads, projects, notifications, activities }: { leads: any[]; projects: any[]; notifications: any[]; activities: Activity[] }) => {
   const converted = leads.filter(l => l.status === 'Converted').length;
   const conversionRate = leads.length > 0 ? Math.round((converted / leads.length) * 100) : 0;
   const assignedLeads = leads.filter(l => l.assignedTo).length;
