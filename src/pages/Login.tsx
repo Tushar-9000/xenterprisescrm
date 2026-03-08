@@ -146,7 +146,7 @@ const Login = () => {
                 onClick={() => {
                   setName(u.name);
                   setEmail(u.email);
-                  setPassword('password123');
+                  setPassword(u.password || `${u.name}123`);
                 }}
                 className="w-full flex items-center justify-between px-4 py-3 rounded-md text-login-card-foreground hover:bg-secondary/10 transition-colors group"
               >
