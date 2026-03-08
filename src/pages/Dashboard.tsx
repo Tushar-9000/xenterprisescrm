@@ -113,7 +113,7 @@ const AdminDashboard = ({ leads, projects, notifications }: { leads: any[]; proj
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <Card className="bg-card border-border">
           <CardHeader className="pb-3">
-            <CardTitle className="text-lg flex items-center gap-2"><Activity className="h-4 w-4 text-primary" /> Recent Leads</CardTitle>
+            <CardTitle className="text-lg flex items-center gap-2"><ActivityIcon className="h-4 w-4 text-primary" /> Recent Leads</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
