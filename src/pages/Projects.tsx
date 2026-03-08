@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { isValidEmail, isValidPhone, sanitizePhone } from '@/lib/validation';
 import { format } from 'date-fns';
 import { useAuth } from '@/context/AuthContext';
 import { useCRM } from '@/context/CRMContext';
@@ -45,6 +46,8 @@ const Projects = () => {
       toast.error('Please fill in project name, client name and email');
       return;
     }
+    if (!isValidEmail(newProject.clientEmail)) { toast.error('Please enter a valid client email'); return; }
+    if (newProject.clientPhone && !isValidPhone(newProject.clientPhone)) { toast.error('Please enter a valid phone number'); return; }
     addProject({
       name: newProject.name,
       clientName: newProject.clientName,
@@ -101,7 +104,7 @@ const Projects = () => {
                 <Input placeholder="Project Name *" value={newProject.name} onChange={e => setNewProject(p => ({ ...p, name: e.target.value }))} />
                 <Input placeholder="Client Name *" value={newProject.clientName} onChange={e => setNewProject(p => ({ ...p, clientName: e.target.value }))} />
                 <Input placeholder="Client Email *" type="email" value={newProject.clientEmail} onChange={e => setNewProject(p => ({ ...p, clientEmail: e.target.value }))} />
-                <Input placeholder="Client Phone" value={newProject.clientPhone} onChange={e => setNewProject(p => ({ ...p, clientPhone: e.target.value }))} />
+                <Input placeholder="Client Phone" value={newProject.clientPhone} onChange={e => setNewProject(p => ({ ...p, clientPhone: sanitizePhone(e.target.value) }))} />
                 <Button onClick={handleAddProject} className="w-full">Create Project</Button>
               </div>
             </DialogContent>

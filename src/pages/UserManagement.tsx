@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { isValidEmail, isValidPhone, sanitizePhone } from '@/lib/validation';
 import { useNavigate } from 'react-router-dom';
 import { useCRM } from '@/context/CRMContext';
 import { ROLE_LABELS, UserRole } from '@/types/crm';
@@ -21,6 +22,8 @@ const UserManagement = () => {
 
   const handleAdd = () => {
     if (!newUser.name || !newUser.email) { toast.error('Name and email are required'); return; }
+    if (!isValidEmail(newUser.email)) { toast.error('Please enter a valid email'); return; }
+    if (newUser.phone && !isValidPhone(newUser.phone)) { toast.error('Please enter a valid phone number'); return; }
     addUser({ ...newUser, joiningDate: newUser.joiningDate || new Date().toISOString().split('T')[0] });
     setNewUser({ name: '', email: '', phone: '', role: 'telecaller', joiningDate: '' });
     setAddOpen(false);
@@ -29,6 +32,8 @@ const UserManagement = () => {
 
   const handleEdit = () => {
     if (!editUserId) return;
+    if (!isValidEmail(editData.email)) { toast.error('Please enter a valid email'); return; }
+    if (editData.phone && !isValidPhone(editData.phone)) { toast.error('Please enter a valid phone number'); return; }
     updateUser(editUserId, editData);
     setEditUserId(null);
     toast.success('User updated');
@@ -55,7 +60,7 @@ const UserManagement = () => {
             <div className="space-y-3">
               <Input placeholder="Full Name *" value={newUser.name} onChange={e => setNewUser(p => ({ ...p, name: e.target.value }))} />
               <Input placeholder="Email *" type="email" value={newUser.email} onChange={e => setNewUser(p => ({ ...p, email: e.target.value }))} />
-              <Input placeholder="Phone" value={newUser.phone} onChange={e => setNewUser(p => ({ ...p, phone: e.target.value }))} />
+              <Input placeholder="Phone" value={newUser.phone} onChange={e => setNewUser(p => ({ ...p, phone: sanitizePhone(e.target.value) }))} />
               <Select value={newUser.role} onValueChange={(v) => setNewUser(p => ({ ...p, role: v as UserRole }))}>
                 <SelectTrigger className="bg-secondary border-border"><SelectValue /></SelectTrigger>
                 <SelectContent>
@@ -101,7 +106,7 @@ const UserManagement = () => {
                           <div className="space-y-3">
                             <Input placeholder="Full Name" value={editData.name} onChange={e => setEditData(p => ({ ...p, name: e.target.value }))} />
                             <Input placeholder="Email" type="email" value={editData.email} onChange={e => setEditData(p => ({ ...p, email: e.target.value }))} />
-                            <Input placeholder="Phone" value={editData.phone} onChange={e => setEditData(p => ({ ...p, phone: e.target.value }))} />
+                            <Input placeholder="Phone" value={editData.phone} onChange={e => setEditData(p => ({ ...p, phone: sanitizePhone(e.target.value) }))} />
                             <Select value={editData.role} onValueChange={(v) => setEditData(p => ({ ...p, role: v as UserRole }))}>
                               <SelectTrigger className="bg-secondary border-border"><SelectValue /></SelectTrigger>
                               <SelectContent>
