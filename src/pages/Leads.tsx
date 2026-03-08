@@ -43,7 +43,6 @@ const Leads = () => {
   // Telecaller: show assigned leads grouped by folder
   if (isTelecaller) {
     const myLeads = leads.filter(l => l.assignedTo === user.id);
-    const [telecallerFolder, setTelecallerFolder] = useState<string | null>(null);
 
     // Group leads by folder
     const folderIds = [...new Set(myLeads.map(l => l.folderId).filter(Boolean))] as string[];
