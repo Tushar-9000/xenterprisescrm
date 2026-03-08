@@ -10,7 +10,7 @@ import { UserCircle, Camera, Save, ArrowLeft, Eye, EyeOff, KeyRound } from 'luci
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
 const Profile = () => {
-  const { user: currentUser } = useAuth();
+  const { user: currentUser, passwords, updatePassword } = useAuth();
   const { users, updateUser } = useCRM();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
