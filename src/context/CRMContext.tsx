@@ -155,8 +155,10 @@ export const CRMProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   }, [projects]);
 
   const updateProjectStatus = useCallback((projectId: string, status: ProjectStatus) => {
+    const project = projects.find(p => p.id === projectId);
     setProjects(prev => prev.map(p => p.id === projectId ? { ...p, status, updatedAt: new Date().toISOString() } : p));
-  }, []);
+    addActivity('project_status_changed', 'Project Status Updated', `"${project?.name || projectId}" status changed to ${status}`);
+  }, [projects]);
 
   const renameProject = useCallback((projectId: string, name: string) => {
     setProjects(prev => prev.map(p => p.id === projectId ? { ...p, name, updatedAt: new Date().toISOString() } : p));
