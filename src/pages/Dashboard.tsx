@@ -313,7 +313,7 @@ const TechLeadDashboard = ({ projects }: { projects: any[] }) => {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         {[
           { label: 'Total Projects', value: projects.length, icon: FolderKanban },
-          { label: 'In Progress', value: active, icon: Activity },
+          { label: 'In Progress', value: active, icon: ActivityIcon },
           { label: 'Planning', value: planning, icon: Clock },
           { label: 'Completed', value: completed, icon: CheckCircle },
         ].map((s, i) => (
