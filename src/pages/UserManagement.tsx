@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useCRM } from '@/context/CRMContext';
 import { ROLE_LABELS, UserRole } from '@/types/crm';
 import { Card, CardContent } from '@/components/ui/card';
@@ -7,10 +8,11 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-import { UserCircle, Plus, Trash2, Pencil, Mail, Phone, Calendar } from 'lucide-react';
+import { UserCircle, Plus, Trash2, Pencil, Mail, Phone, Calendar, ExternalLink } from 'lucide-react';
 import { toast } from 'sonner';
 
 const UserManagement = () => {
+  const navigate = useNavigate();
   const { users, addUser, removeUser, updateUser } = useCRM();
   const [addOpen, setAddOpen] = useState(false);
   const [editUserId, setEditUserId] = useState<string | null>(null);
@@ -84,6 +86,9 @@ const UserManagement = () => {
                       <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">{ROLE_LABELS[user.role]}</span>
                     </div>
                     <div className="flex items-center gap-1">
+                      <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => navigate(`/profile?userId=${user.id}`)} title="View Profile">
+                        <ExternalLink className="h-3.5 w-3.5" />
+                      </Button>
                       <Dialog open={editUserId === user.id} onOpenChange={(o) => {
                         setEditUserId(o ? user.id : null);
                         if (o) setEditData({ name: user.name, email: user.email, phone: user.phone || '', role: user.role, joiningDate: user.joiningDate || '' });
