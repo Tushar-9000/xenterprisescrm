@@ -149,8 +149,10 @@ export const CRMProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   }, []);
 
   const deleteProject = useCallback((projectId: string) => {
+    const project = projects.find(p => p.id === projectId);
     setProjects(prev => prev.filter(p => p.id !== projectId));
-  }, []);
+    addActivity('project_deleted', 'Project Deleted', `Project "${project?.name || projectId}" removed`);
+  }, [projects]);
 
   const updateProjectStatus = useCallback((projectId: string, status: ProjectStatus) => {
     setProjects(prev => prev.map(p => p.id === projectId ? { ...p, status, updatedAt: new Date().toISOString() } : p));
