@@ -348,8 +348,8 @@ const Leads = () => {
                 <DialogHeader><DialogTitle>Add Lead to {currentFolder?.name}</DialogTitle></DialogHeader>
                 <div className="space-y-3">
                   <Input placeholder="Name *" value={newLead.name} onChange={e => setNewLead(p => ({ ...p, name: e.target.value }))} />
-                  <Input placeholder="Email" value={newLead.email} onChange={e => setNewLead(p => ({ ...p, email: e.target.value }))} />
-                  <Input placeholder="Phone *" value={newLead.phone} onChange={e => setNewLead(p => ({ ...p, phone: e.target.value }))} />
+                  <Input placeholder="Email" type="email" value={newLead.email} onChange={e => setNewLead(p => ({ ...p, email: e.target.value }))} />
+                  <Input placeholder="Phone *" value={newLead.phone} onChange={e => setNewLead(p => ({ ...p, phone: sanitizePhone(e.target.value) }))} />
                   <Input placeholder="Company" value={newLead.company} onChange={e => setNewLead(p => ({ ...p, company: e.target.value }))} />
                   <Input placeholder="Source" value={newLead.source} onChange={e => setNewLead(p => ({ ...p, source: e.target.value }))} />
                   <Button onClick={handleAddLead} className="w-full">Add Lead</Button>
