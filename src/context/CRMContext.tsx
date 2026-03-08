@@ -115,24 +115,31 @@ export const CRMProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       const updated = { ...l, status, updatedAt: new Date().toISOString() };
       if (status === 'Converted') {
         addActivity('lead_status_changed', 'Lead Converted', `"${l.name}" marked as converted — awaiting project request`, userId);
+        notifyByRole(['admin', 'sales_manager'], 'Lead Converted', `"${l.name}" has been converted`, 'conversion', userId);
       } else {
         addActivity('lead_status_changed', 'Lead Status Updated', `"${l.name}" status changed to ${status}`, userId);
+        notifyByRole(['admin', 'sales_manager'], 'Lead Status Changed', `"${l.name}" status → ${status}`, 'info', userId);
       }
       return updated;
     }));
-  }, []);
+  }, [users]);
 
   const assignLead = useCallback((leadId: string, userId: string) => {
     const lead = leads.find(l => l.id === leadId);
     const assignee = users.find(u => u.id === userId);
     setLeads(prev => prev.map(l => l.id === leadId ? { ...l, assignedTo: userId, updatedAt: new Date().toISOString() } : l));
-    addNotification({ title: 'New Lead Assigned', message: `A new lead has been assigned to you`, type: 'assignment', userId });
+    addNotification({ title: 'New Lead Assigned', message: `Lead "${lead?.name || ''}" has been assigned to you`, type: 'assignment', userId });
+    notifyByRole(['admin'], 'Lead Assigned', `"${lead?.name || leadId}" assigned to ${assignee?.name || userId}`, 'info');
     addActivity('lead_assigned', 'Lead Assigned', `"${lead?.name || leadId}" assigned to ${assignee?.name || userId}`, userId);
   }, [leads, users]);
 
   const addLeadNote = useCallback((leadId: string, note: Omit<Note, 'id' | 'createdAt'>) => {
+    const lead = leads.find(l => l.id === leadId);
     setLeads(prev => prev.map(l => l.id === leadId ? { ...l, notes: [...l.notes, { ...note, id: `n-${Date.now()}`, createdAt: new Date().toISOString() }], updatedAt: new Date().toISOString() } : l));
-  }, []);
+    if (lead?.assignedTo && lead.assignedTo !== note.createdBy) {
+      addNotification({ title: 'New Note on Lead', message: `A note was added to "${lead.name}"`, type: 'info', userId: lead.assignedTo });
+    }
+  }, [leads]);
 
   // Project Request workflow
   const addProjectRequest = useCallback((request: Omit<ProjectRequest, 'id' | 'status' | 'createdAt'>) => {
