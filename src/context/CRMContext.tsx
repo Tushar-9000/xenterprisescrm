@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
-import { Lead, Project, Notification, Note, LeadStatus, ProjectStatus } from '@/types/crm';
+import { Lead, Project, Notification, Note, LeadStatus, ProjectStatus, Developer, MOCK_DEVELOPERS } from '@/types/crm';
 
 interface CRMContextType {
   leads: Lead[];
