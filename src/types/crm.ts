@@ -75,7 +75,24 @@ export interface Notification {
   createdAt: string;
 }
 
-export type ActivityType = 'lead_added' | 'lead_updated' | 'lead_deleted' | 'lead_status_changed' | 'lead_assigned' | 'lead_note_added' | 'project_added' | 'project_deleted' | 'project_status_changed' | 'project_renamed' | 'project_deadline_set' | 'developer_assigned' | 'developer_added' | 'developer_removed' | 'user_added' | 'user_removed' | 'folder_added' | 'folder_deleted';
+export type ProjectRequestStatus = 'pending' | 'approved' | 'rejected';
+
+export interface ProjectRequest {
+  id: string;
+  leadId: string;
+  leadName: string;
+  projectName: string;
+  clientName: string;
+  clientEmail: string;
+  clientPhone: string;
+  description: string;
+  requestedBy: string;
+  status: ProjectRequestStatus;
+  rejectionReason?: string;
+  createdAt: string;
+}
+
+export type ActivityType = 'lead_added' | 'lead_updated' | 'lead_deleted' | 'lead_status_changed' | 'lead_assigned' | 'lead_note_added' | 'project_added' | 'project_deleted' | 'project_status_changed' | 'project_renamed' | 'project_deadline_set' | 'developer_assigned' | 'developer_added' | 'developer_removed' | 'user_added' | 'user_removed' | 'folder_added' | 'folder_deleted' | 'project_request_created' | 'project_request_approved' | 'project_request_rejected';
 
 export interface Activity {
   id: string;

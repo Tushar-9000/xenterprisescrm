@@ -2,7 +2,7 @@ import { useState, useRef } from 'react';
 import { isValidEmail, isValidPhone, sanitizePhone } from '@/lib/validation';
 import { useAuth } from '@/context/AuthContext';
 import { useCRM } from '@/context/CRMContext';
-import { LeadStatus } from '@/types/crm';
+import { LeadStatus, Lead } from '@/types/crm';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -17,7 +17,7 @@ const STATUSES: LeadStatus[] = ['New', 'Contacted', 'Follow-up', 'Interested', '
 
 const Leads = () => {
   const { user } = useAuth();
-  const { leads, folders, addFolder, deleteFolder, renameFolder, addLead, updateLead, deleteLead, updateLeadStatus, assignLead, addLeadNote } = useCRM();
+  const { leads, folders, addFolder, deleteFolder, renameFolder, addLead, updateLead, deleteLead, updateLeadStatus, assignLead, addLeadNote, addProjectRequest } = useCRM();
   const { users } = useCRM();
 
   const [selectedFolder, setSelectedFolder] = useState<string | null>(null);
@@ -36,6 +36,10 @@ const Leads = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [telecallerFolder, setTelecallerFolder] = useState<string | null>(null);
 
+  // Project request dialog state
+  const [convertLead, setConvertLead] = useState<Lead | null>(null);
+  const [projectDetails, setProjectDetails] = useState({ projectName: '', description: '' });
+
   if (!user) return null;
 
   const isManager = user.role === 'sales_manager' || user.role === 'admin';
@@ -51,6 +55,36 @@ const Leads = () => {
     const currentTcFolder = folders.find(f => f.id === telecallerFolder);
     const tcFolderLeads = telecallerFolder ? myLeads.filter(l => l.folderId === telecallerFolder) : [];
 
+    const projectRequestDialog = (
+      <Dialog open={!!convertLead} onOpenChange={(o) => { if (!o) { setConvertLead(null); setProjectDetails({ projectName: '', description: '' }); } }}>
+        <DialogContent className="bg-card border-border">
+          <DialogHeader><DialogTitle>Submit Project Request</DialogTitle></DialogHeader>
+          <p className="text-sm text-muted-foreground">
+            Lead "<span className="font-medium text-foreground">{convertLead?.name}</span>" is finalized. Fill in project details to send an approval request to Admin.
+          </p>
+          <div className="space-y-3">
+            <Input placeholder="Project Name *" value={projectDetails.projectName} onChange={e => setProjectDetails(p => ({ ...p, projectName: e.target.value }))} />
+            <Textarea placeholder="Project description / requirements..." value={projectDetails.description} onChange={e => setProjectDetails(p => ({ ...p, description: e.target.value }))} />
+            <div className="bg-secondary/50 rounded p-3 text-sm space-y-1">
+              <p><span className="text-muted-foreground">Client:</span> {convertLead?.name}</p>
+              <p><span className="text-muted-foreground">Email:</span> {convertLead?.email}</p>
+              <p><span className="text-muted-foreground">Phone:</span> {convertLead?.phone}</p>
+              {convertLead?.company && <p><span className="text-muted-foreground">Company:</span> {convertLead.company}</p>}
+            </div>
+            <Button className="w-full" onClick={() => {
+              if (!projectDetails.projectName.trim()) { toast.error('Project name is required'); return; }
+              if (!convertLead) return;
+              addProjectRequest({ leadId: convertLead.id, leadName: convertLead.name, projectName: projectDetails.projectName.trim(), clientName: convertLead.name, clientEmail: convertLead.email, clientPhone: convertLead.phone, description: projectDetails.description.trim(), requestedBy: user.id });
+              updateLeadStatus(convertLead.id, 'Converted', user.id);
+              setConvertLead(null);
+              setProjectDetails({ projectName: '', description: '' });
+              toast.success('Project request sent to Admin for approval');
+            }}>Send Request to Admin</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+
     if (telecallerFolder) {
       return (
         <div className="space-y-6 animate-fade-in">
@@ -62,7 +96,8 @@ const Leads = () => {
               <p className="text-muted-foreground text-sm">{tcFolderLeads.length} leads assigned</p>
             </div>
           </div>
-          <LeadTable leads={tcFolderLeads} user={user} isManager={false} isTelecaller={true} />
+          <LeadTable leads={tcFolderLeads} user={user} isManager={false} isTelecaller={true} onConvert={(lead) => { setConvertLead(lead); setProjectDetails({ projectName: `${lead.name} Project`, description: '' }); }} />
+          {projectRequestDialog}
         </div>
       );
     }
@@ -367,6 +402,7 @@ const Leads = () => {
         isTelecaller={false}
         onEdit={(lead) => { setEditLeadId(lead.id); setEditLeadData({ name: lead.name, email: lead.email, phone: lead.phone, company: lead.company || '', source: lead.source || '' }); }}
         onDelete={(id) => { deleteLead(id); toast.success('Lead deleted'); }}
+        onConvert={(lead) => { setConvertLead(lead); setProjectDetails({ projectName: `${lead.name} Project`, description: '' }); }}
       />
 
       {/* Edit Lead Dialog */}
@@ -383,18 +419,47 @@ const Leads = () => {
           </div>
         </DialogContent>
       </Dialog>
+      {/* Project Request Dialog */}
+      <Dialog open={!!convertLead} onOpenChange={(o) => { if (!o) { setConvertLead(null); setProjectDetails({ projectName: '', description: '' }); } }}>
+        <DialogContent className="bg-card border-border">
+          <DialogHeader><DialogTitle>Submit Project Request</DialogTitle></DialogHeader>
+          <p className="text-sm text-muted-foreground">
+            Lead "<span className="font-medium text-foreground">{convertLead?.name}</span>" is finalized. Fill in project details to send an approval request to Admin. Once approved, it will be assigned to Tech Lead.
+          </p>
+          <div className="space-y-3">
+            <Input placeholder="Project Name *" value={projectDetails.projectName} onChange={e => setProjectDetails(p => ({ ...p, projectName: e.target.value }))} />
+            <Textarea placeholder="Project description / requirements..." value={projectDetails.description} onChange={e => setProjectDetails(p => ({ ...p, description: e.target.value }))} />
+            <div className="bg-secondary/50 rounded p-3 text-sm space-y-1">
+              <p><span className="text-muted-foreground">Client:</span> {convertLead?.name}</p>
+              <p><span className="text-muted-foreground">Email:</span> {convertLead?.email}</p>
+              <p><span className="text-muted-foreground">Phone:</span> {convertLead?.phone}</p>
+              {convertLead?.company && <p><span className="text-muted-foreground">Company:</span> {convertLead.company}</p>}
+            </div>
+            <Button className="w-full" onClick={() => {
+              if (!projectDetails.projectName.trim()) { toast.error('Project name is required'); return; }
+              if (!convertLead) return;
+              addProjectRequest({ leadId: convertLead.id, leadName: convertLead.name, projectName: projectDetails.projectName.trim(), clientName: convertLead.name, clientEmail: convertLead.email, clientPhone: convertLead.phone, description: projectDetails.description.trim(), requestedBy: user.id });
+              updateLeadStatus(convertLead.id, 'Converted', user.id);
+              setConvertLead(null);
+              setProjectDetails({ projectName: '', description: '' });
+              toast.success('Project request sent to Admin for approval');
+            }}>Send Request to Admin</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
 
 // Shared Lead Table
-const LeadTable = ({ leads, user, isManager, isTelecaller, onEdit, onDelete }: {
+const LeadTable = ({ leads, user, isManager, isTelecaller, onEdit, onDelete, onConvert }: {
   leads: any[];
   user: any;
   isManager: boolean;
   isTelecaller: boolean;
   onEdit?: (lead: any) => void;
   onDelete?: (id: string) => void;
+  onConvert?: (lead: any) => void;
 }) => {
   const { updateLeadStatus, assignLead, addLeadNote, users } = useCRM();
   const [noteOpen, setNoteOpen] = useState<string | null>(null);
@@ -439,14 +504,27 @@ const LeadTable = ({ leads, user, isManager, isTelecaller, onEdit, onDelete }: {
                   <td className="py-3 px-4 text-muted-foreground">{lead.company || '—'}</td>
                   <td className="py-3 px-4">
                     {(isTelecaller || isManager) && lead.status !== 'Converted' ? (
-                      <Select value={lead.status} onValueChange={(v) => updateLeadStatus(lead.id, v as LeadStatus, user.id)}>
-                        <SelectTrigger className="w-32 h-8 text-xs bg-secondary border-border">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {STATUSES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
-                        </SelectContent>
-                      </Select>
+                      <div className="flex items-center gap-1">
+                        <Select value={lead.status} onValueChange={(v) => {
+                          if (v === 'Converted') {
+                            if (onConvert) onConvert(lead);
+                            return;
+                          }
+                          updateLeadStatus(lead.id, v as LeadStatus, user.id);
+                        }}>
+                          <SelectTrigger className="w-32 h-8 text-xs bg-secondary border-border">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {STATUSES.filter(s => s !== 'Converted').map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                          </SelectContent>
+                        </Select>
+                        {lead.status === 'Interested' && onConvert && (
+                          <Button size="sm" variant="default" className="h-8 text-xs" onClick={() => onConvert(lead)}>
+                            Convert
+                          </Button>
+                        )}
+                      </div>
                     ) : (
                       <StatusBadge status={lead.status} />
                     )}
