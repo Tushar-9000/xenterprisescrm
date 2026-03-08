@@ -122,6 +122,9 @@ export const CRMProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         setProjects(prev => [...prev, newProject]);
         addNotification({ title: 'Lead Converted', message: `${l.name} has been converted to a project`, type: 'conversion', userId: '2' });
         addNotification({ title: 'Lead Converted', message: `${l.name} has been converted to a project`, type: 'conversion', userId: '1' });
+        addActivity('lead_status_changed', 'Lead Converted', `"${l.name}" converted to project`, userId);
+      } else {
+        addActivity('lead_status_changed', 'Lead Status Updated', `"${l.name}" status changed to ${status}`, userId);
       }
       return updated;
     }));
