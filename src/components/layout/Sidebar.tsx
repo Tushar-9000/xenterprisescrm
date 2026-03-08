@@ -98,6 +98,7 @@ function getNavItems(role: string) {
     case 'admin':
       return [...common,
         { path: '/leads', label: 'All Leads', icon: Phone },
+        { path: '/project-requests', label: 'Project Requests', icon: FileCheck },
         { path: '/projects', label: 'Projects', icon: FolderKanban },
         { path: '/developers', label: 'Developers', icon: UserCircle },
         { path: '/users', label: 'User Management', icon: Users },

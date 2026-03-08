@@ -44,6 +44,7 @@ const AppRoutes = () => {
         <Route path="/leaderboard" element={<Leaderboard />} />
         <Route path="/developers" element={<DeveloperManagement />} />
         <Route path="/lead-status" element={<LeadStatus />} />
+        <Route path="/project-requests" element={<ProjectRequests />} />
         <Route path="/users" element={<UserManagement />} />
         <Route path="/settings" element={<SettingsPage />} />
         <Route path="/profile" element={<Profile />} />
