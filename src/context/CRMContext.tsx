@@ -33,6 +33,7 @@ interface CRMContextType {
   removeUser: (userId: string) => void;
   updateUser: (userId: string, data: Partial<User>) => void;
   markNotificationRead: (notificationId: string) => void;
+  markAllNotificationsRead: (userId: string) => void;
   getUnreadCount: (userId: string) => number;
   addProjectRequest: (request: Omit<ProjectRequest, 'id' | 'status' | 'createdAt'>) => void;
   approveProjectRequest: (requestId: string) => void;
@@ -294,6 +295,10 @@ export const CRMProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setNotifications(prev => prev.map(n => n.id === notificationId ? { ...n, read: true } : n));
   }, []);
 
+  const markAllNotificationsRead = useCallback((userId: string) => {
+    setNotifications(prev => prev.map(n => n.userId === userId ? { ...n, read: true } : n));
+  }, []);
+
   const getUnreadCount = useCallback((userId: string) => {
     return notifications.filter(n => n.userId === userId && !n.read).length;
   }, [notifications]);
@@ -304,7 +309,7 @@ export const CRMProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       addFolder, deleteFolder, renameFolder,
       addLead, updateLead, deleteLead, updateLeadStatus, assignLead, addLeadNote,
       addProject, deleteProject, updateProjectStatus, renameProject, setProjectDeadline, addProjectNote, assignDeveloper,
-      markNotificationRead, getUnreadCount,
+      markNotificationRead, markAllNotificationsRead, getUnreadCount,
       developers, addDeveloper, removeDeveloper, updateDeveloper,
       addUser, removeUser, updateUser,
       addProjectRequest, approveProjectRequest, rejectProjectRequest,
