@@ -45,6 +45,7 @@ const AppRoutes = () => {
         <Route path="/lead-status" element={<LeadStatus />} />
         <Route path="/users" element={<UserManagement />} />
         <Route path="/settings" element={<SettingsPage />} />
+        <Route path="/profile" element={<Profile />} />
       </Route>
       <Route path="*" element={<NotFound />} />
     </Routes>

@@ -149,7 +149,7 @@ const Profile = () => {
           <div>
             <label className="text-sm font-medium text-foreground">Role</label>
             {canEditAll ? (
-              <Select value={form.role} onValueChange={v => setForm(p => ({ ...p, role: v }))}>
+              <Select value={form.role} onValueChange={(v: string) => setForm(p => ({ ...p, role: v as User['role'] }))}>
                 <SelectTrigger className="mt-1">
                   <SelectValue />
                 </SelectTrigger>
