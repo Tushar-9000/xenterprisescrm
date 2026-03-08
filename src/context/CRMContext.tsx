@@ -57,6 +57,11 @@ export const CRMProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [developers, setDevelopers] = useState<Developer[]>(MOCK_DEVELOPERS);
   const [folders, setFolders] = useState<LeadFolder[]>([]);
   const [users, setUsers] = useState<User[]>(MOCK_USERS);
+  const [activities, setActivities] = useState<Activity[]>([]);
+
+  const addActivity = (type: Activity['type'], title: string, description: string, userId?: string) => {
+    setActivities(prev => [{ id: `act-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`, type, title, description, userId, createdAt: new Date().toISOString() }, ...prev]);
+  };
 
   const addNotification = (n: Omit<Notification, 'id' | 'read' | 'createdAt'>) => {
     setNotifications(prev => [...prev, { ...n, id: `notif-${Date.now()}`, read: false, createdAt: new Date().toISOString() }]);
