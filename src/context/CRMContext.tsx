@@ -43,12 +43,7 @@ export const useCRM = () => {
   return ctx;
 };
 
-const INITIAL_LEADS: Lead[] = [
-  { id: 'l1', name: 'Rahul Sharma', email: 'rahul@example.com', phone: '+919876543210', company: 'TechCorp', status: 'New', source: 'Website', notes: [], createdAt: '2026-03-01', updatedAt: '2026-03-01' },
-  { id: 'l2', name: 'Priya Patel', email: 'priya@example.com', phone: '+919876543211', company: 'DesignHub', status: 'Contacted', assignedTo: '4', source: 'Referral', notes: [], createdAt: '2026-03-02', updatedAt: '2026-03-03' },
-  { id: 'l3', name: 'Amit Kumar', email: 'amit@example.com', phone: '+919876543212', company: 'StartupXYZ', status: 'Interested', assignedTo: '4', source: 'LinkedIn', notes: [{ id: 'n1', content: 'Very interested in our services', createdBy: '4', createdAt: '2026-03-04' }], followUpDate: '2026-03-10', createdAt: '2026-03-03', updatedAt: '2026-03-04' },
-  { id: 'l4', name: 'Sneha Gupta', email: 'sneha@example.com', phone: '+919876543213', company: 'MediaPlus', status: 'Follow-up', assignedTo: '4', source: 'Cold Call', notes: [], followUpDate: '2026-03-08', createdAt: '2026-03-04', updatedAt: '2026-03-05' },
-];
+const INITIAL_LEADS: Lead[] = [];
 
 export const CRMProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [leads, setLeads] = useState<Lead[]>(INITIAL_LEADS);
