@@ -145,6 +145,7 @@ export const CRMProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const addProject = useCallback((project: Omit<Project, 'id' | 'notes' | 'createdAt' | 'updatedAt'>) => {
     const now = new Date().toISOString();
     setProjects(prev => [...prev, { ...project, id: `p-${Date.now()}`, notes: [], createdAt: now, updatedAt: now }]);
+    addActivity('project_added', 'Project Created', `New project "${project.name}" for ${project.clientName}`);
   }, []);
 
   const deleteProject = useCallback((projectId: string) => {
