@@ -1,14 +1,24 @@
 import { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
+import { useTheme } from '@/context/ThemeContext';
 import { MOCK_USERS, ROLE_LABELS, UserRole } from '@/types/crm';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import { Moon, Sun, ShieldCheck, BarChart3, Users, Zap } from 'lucide-react';
 
 const ROLE_ORDER: UserRole[] = ['admin', 'tech_lead', 'sales_manager', 'telecaller'];
 
+const FEATURES = [
+  { icon: ShieldCheck, title: 'Role-Based Access', desc: 'Tailored dashboards per role' },
+  { icon: BarChart3, title: 'Lead Pipeline', desc: 'Track every opportunity' },
+  { icon: Users, title: 'Team Management', desc: 'Coordinate your workforce' },
+  { icon: Zap, title: 'Real-time Updates', desc: 'Instant notifications' },
+];
+
 const Login = () => {
-  const { login, loginAs } = useAuth();
+  const { login } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
@@ -21,27 +31,53 @@ const Login = () => {
   };
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-screen relative">
+      {/* Theme toggle */}
+      <button
+        onClick={toggleTheme}
+        className="absolute top-5 right-5 z-50 p-2.5 rounded-full bg-card border border-border text-foreground hover:bg-muted transition-colors"
+        aria-label="Toggle theme"
+      >
+        {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+      </button>
+
       {/* Left side - Branding */}
       <div className="hidden lg:flex lg:flex-1 flex-col justify-center px-16 bg-background">
-        <div className="animate-fade-in">
-          <h1 className="text-5xl font-extrabold tracking-tight mb-12">
+        <div className="animate-fade-in max-w-lg">
+          <h1 className="text-5xl font-extrabold tracking-tight mb-4">
             X Enterprise <span className="text-primary">CRM</span>
           </h1>
+          <p className="text-muted-foreground text-lg mb-10">
+            Powerful customer relationship management for modern teams.
+          </p>
 
-          <div className="grid grid-cols-2 gap-4 max-w-lg">
-            {ROLE_ORDER.map((role) => (
+          {/* Feature highlights */}
+          <div className="grid grid-cols-2 gap-4 mb-10">
+            {FEATURES.map((f) => (
               <div
-                key={role}
-                className="rounded-lg border border-border bg-card p-5 transition-colors hover:border-primary/40"
+                key={f.title}
+                className="flex items-start gap-3 rounded-lg border border-border bg-card p-4 transition-colors hover:border-primary/40"
               >
-                <span className="text-xs font-medium uppercase tracking-wider text-primary">
-                  Role
-                </span>
-                <p className="mt-1 text-lg font-semibold text-foreground">
-                  {ROLE_LABELS[role]}
-                </p>
+                <div className="rounded-md bg-primary/10 p-2">
+                  <f.icon className="h-4 w-4 text-primary" />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-foreground">{f.title}</p>
+                  <p className="text-xs text-muted-foreground">{f.desc}</p>
+                </div>
               </div>
+            ))}
+          </div>
+
+          {/* Role chips */}
+          <div className="flex flex-wrap gap-2">
+            {ROLE_ORDER.map((role) => (
+              <span
+                key={role}
+                className="rounded-full border border-border bg-secondary px-3 py-1 text-xs font-medium text-secondary-foreground"
+              >
+                {ROLE_LABELS[role]}
+              </span>
             ))}
           </div>
         </div>
@@ -50,9 +86,16 @@ const Login = () => {
       {/* Right side - Login form */}
       <div className="flex flex-1 items-center justify-center p-8 lg:flex-none lg:w-[480px] bg-login-card">
         <div className="w-full max-w-sm animate-fade-in" style={{ animationDelay: '0.1s' }}>
-          <h2 className="text-3xl font-bold text-login-card-foreground text-center">Sign In</h2>
+          {/* Mobile logo */}
+          <div className="lg:hidden text-center mb-6">
+            <h1 className="text-2xl font-bold text-login-card-foreground">
+              X Enterprise <span className="text-primary">CRM</span>
+            </h1>
+          </div>
+
+          <h2 className="text-3xl font-bold text-login-card-foreground text-center">Welcome Back</h2>
           <p className="mt-2 text-sm text-muted-foreground text-center mb-8">
-            Access your enterprise dashboard
+            Sign in to access your dashboard
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -62,7 +105,7 @@ const Login = () => {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Your name"
-                className="mt-1 bg-secondary/10 border-border text-login-card-foreground"
+                className="mt-1 bg-secondary/10 border-border text-login-card-foreground placeholder:text-muted-foreground"
               />
             </div>
             <div>
@@ -72,7 +115,7 @@ const Login = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="admin@enterprisecrm.com"
-                className="mt-1 bg-secondary/10 border-border text-login-card-foreground"
+                className="mt-1 bg-secondary/10 border-border text-login-card-foreground placeholder:text-muted-foreground"
               />
             </div>
             <div>
@@ -82,18 +125,18 @@ const Login = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="mt-1 bg-secondary/10 border-border text-login-card-foreground"
+                className="mt-1 bg-secondary/10 border-border text-login-card-foreground placeholder:text-muted-foreground"
               />
             </div>
 
-            <Button type="submit" className="w-full mt-2 bg-background text-foreground hover:bg-background/90 font-semibold py-5">
+            <Button type="submit" className="w-full mt-2 bg-primary text-primary-foreground hover:bg-primary/90 font-semibold py-5">
               Sign In
             </Button>
           </form>
 
           {/* Quick login */}
           <div className="mt-8 space-y-1">
-            <p className="text-xs text-muted-foreground mb-2 text-center">Quick fill by role</p>
+            <p className="text-xs text-muted-foreground mb-2 text-center uppercase tracking-wider">Quick fill by role</p>
             {MOCK_USERS.map((u) => (
               <button
                 key={u.id}
@@ -102,10 +145,10 @@ const Login = () => {
                   setEmail(u.email);
                   setPassword('password123');
                 }}
-                className="w-full flex items-center justify-between px-4 py-3 rounded-md text-login-card-foreground hover:bg-secondary/10 transition-colors"
+                className="w-full flex items-center justify-between px-4 py-3 rounded-md text-login-card-foreground hover:bg-secondary/10 transition-colors group"
               >
                 <span className="font-medium text-sm">{u.name}</span>
-                <span className="text-xs text-primary">{ROLE_LABELS[u.role]}</span>
+                <span className="text-xs text-primary opacity-70 group-hover:opacity-100 transition-opacity">{ROLE_LABELS[u.role]}</span>
               </button>
             ))}
           </div>
