@@ -70,3 +70,15 @@ export const MOCK_USERS: User[] = [
   { id: '3', name: 'Vansh', email: 'vansh@enterprisecrm.com', role: 'sales_manager' },
   { id: '4', name: 'Akanksha', email: 'akanksha@enterprisecrm.com', role: 'telecaller' },
 ];
+
+export interface Developer {
+  id: string;
+  name: string;
+}
+
+export const MOCK_DEVELOPERS: Developer[] = [
+  { id: 'd1', name: 'Rohit Verma' },
+  { id: 'd2', name: 'Neha Singh' },
+  { id: 'd3', name: 'Karan Mehta' },
+  { id: 'd4', name: 'Divya Joshi' },
+];
