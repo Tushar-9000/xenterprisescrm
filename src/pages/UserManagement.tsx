@@ -60,7 +60,7 @@ const UserManagement = () => {
             <div className="space-y-3">
               <Input placeholder="Full Name *" value={newUser.name} onChange={e => setNewUser(p => ({ ...p, name: e.target.value }))} />
               <Input placeholder="Email *" type="email" value={newUser.email} onChange={e => setNewUser(p => ({ ...p, email: e.target.value }))} />
-              <Input placeholder="Phone" value={newUser.phone} onChange={e => setNewUser(p => ({ ...p, phone: e.target.value }))} />
+              <Input placeholder="Phone" value={newUser.phone} onChange={e => setNewUser(p => ({ ...p, phone: sanitizePhone(e.target.value) }))} />
               <Select value={newUser.role} onValueChange={(v) => setNewUser(p => ({ ...p, role: v as UserRole }))}>
                 <SelectTrigger className="bg-secondary border-border"><SelectValue /></SelectTrigger>
                 <SelectContent>
