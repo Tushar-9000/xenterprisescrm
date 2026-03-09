@@ -570,6 +570,7 @@ const LeadTable = ({ leads, user, isManager, isTelecaller, onEdit, onDelete, onC
                   <td className="py-3 px-4 font-medium">{lead.name}</td>
                   <td className="py-3 px-4 text-muted-foreground">{lead.phone}</td>
                   <td className="py-3 px-4 text-muted-foreground">{lead.company || '—'}</td>
+                  <td className="py-3 px-4"><SocialMediaIcons social={lead.socialMedia} /></td>
                   <td className="py-3 px-4">
                     {(isTelecaller || isManager) && lead.status !== 'Converted' ? (
                       <div className="flex items-center gap-1">
