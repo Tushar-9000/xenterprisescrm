@@ -94,10 +94,10 @@ const Leads = () => {
 
   const [addOpen, setAddOpen] = useState(false);
   const [editLeadId, setEditLeadId] = useState<string | null>(null);
-  const [editLeadData, setEditLeadData] = useState({ name: '', email: '', phone: '', company: '', source: '' });
+  const [editLeadData, setEditLeadData] = useState({ name: '', email: '', phone: '', company: '', source: '', socialMedia: {} as LeadSocialMedia });
   const [noteOpen, setNoteOpen] = useState<string | null>(null);
   const [noteText, setNoteText] = useState('');
-  const [newLead, setNewLead] = useState({ name: '', email: '', phone: '', company: '', source: '' });
+  const [newLead, setNewLead] = useState({ name: '', email: '', phone: '', company: '', source: '', socialMedia: {} as LeadSocialMedia });
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [telecallerFolder, setTelecallerFolder] = useState<string | null>(null);
 
