@@ -452,6 +452,7 @@ const Leads = () => {
                   <Input placeholder="Phone *" value={newLead.phone} onChange={e => setNewLead(p => ({ ...p, phone: sanitizePhone(e.target.value) }))} />
                   <Input placeholder="Company" value={newLead.company} onChange={e => setNewLead(p => ({ ...p, company: e.target.value }))} />
                   <Input placeholder="Source" value={newLead.source} onChange={e => setNewLead(p => ({ ...p, source: e.target.value }))} />
+                  <SocialMediaInputs social={newLead.socialMedia} onChange={s => setNewLead(p => ({ ...p, socialMedia: s }))} />
                   <Button onClick={handleAddLead} className="w-full">Add Lead</Button>
                 </div>
               </DialogContent>
