@@ -251,7 +251,7 @@ const Leads = () => {
     if (newLead.email && !isValidEmail(newLead.email)) { toast.error('Please enter a valid email'); return; }
     if (!isValidPhone(newLead.phone)) { toast.error('Please enter a valid phone number'); return; }
     addLead({ ...newLead, status: 'New', folderId: selectedFolder || undefined });
-    setNewLead({ name: '', email: '', phone: '', company: '', source: '', socialMedia: {} });
+    setNewLead({ name: '', email: '', phone: '', company: '', socialMedia: {} });
     setAddOpen(false);
     toast.success('Lead added');
   };
