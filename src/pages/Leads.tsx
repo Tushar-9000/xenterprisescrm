@@ -320,7 +320,7 @@ const Leads = () => {
   const handleExport = () => {
     const data = folderLeads;
     if (data.length === 0) { toast.error('No leads to export'); return; }
-    const csv = ['Name,Email,Phone,Company,Source,Status', ...data.map(l => `${l.name},${l.email},${l.phone},${l.company || ''},${l.source || ''},${l.status}`)].join('\n');
+    const csv = ['Name,Email,Phone,Company,Status', ...data.map(l => `${l.name},${l.email},${l.phone},${l.company || ''},${l.status}`)].join('\n');
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
