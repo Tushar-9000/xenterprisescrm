@@ -17,6 +17,14 @@ export interface User {
 
 export type LeadStatus = 'New' | 'Contacted' | 'Follow-up' | 'Interested' | 'Not Interested' | 'Converted';
 
+export interface LeadSocialMedia {
+  instagram?: string;
+  facebook?: string;
+  linkedin?: string;
+  twitter?: string;
+  youtube?: string;
+}
+
 export interface Lead {
   id: string;
   name: string;
@@ -26,6 +34,7 @@ export interface Lead {
   status: LeadStatus;
   assignedTo?: string;
   source?: string;
+  socialMedia?: LeadSocialMedia;
   notes: Note[];
   followUpDate?: string;
   folderId?: string;
