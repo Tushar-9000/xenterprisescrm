@@ -292,7 +292,7 @@ const Leads = () => {
       const emailIdx = headers.findIndex(h => h.includes('email'));
       const phoneIdx = headers.findIndex(h => h.includes('phone'));
       const companyIdx = headers.findIndex(h => h.includes('company'));
-      const sourceIdx = headers.findIndex(h => h.includes('source'));
+      
 
       let imported = 0;
       for (let i = 1; i < lines.length; i++) {
