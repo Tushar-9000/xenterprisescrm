@@ -94,10 +94,10 @@ const Leads = () => {
 
   const [addOpen, setAddOpen] = useState(false);
   const [editLeadId, setEditLeadId] = useState<string | null>(null);
-  const [editLeadData, setEditLeadData] = useState({ name: '', email: '', phone: '', company: '', source: '', socialMedia: {} as LeadSocialMedia });
+  const [editLeadData, setEditLeadData] = useState({ name: '', email: '', phone: '', company: '', socialMedia: {} as LeadSocialMedia });
   const [noteOpen, setNoteOpen] = useState<string | null>(null);
   const [noteText, setNoteText] = useState('');
-  const [newLead, setNewLead] = useState({ name: '', email: '', phone: '', company: '', source: '', socialMedia: {} as LeadSocialMedia });
+  const [newLead, setNewLead] = useState({ name: '', email: '', phone: '', company: '', socialMedia: {} as LeadSocialMedia });
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [telecallerFolder, setTelecallerFolder] = useState<string | null>(null);
 
@@ -251,7 +251,7 @@ const Leads = () => {
     if (newLead.email && !isValidEmail(newLead.email)) { toast.error('Please enter a valid email'); return; }
     if (!isValidPhone(newLead.phone)) { toast.error('Please enter a valid phone number'); return; }
     addLead({ ...newLead, status: 'New', folderId: selectedFolder || undefined });
-    setNewLead({ name: '', email: '', phone: '', company: '', source: '', socialMedia: {} });
+    setNewLead({ name: '', email: '', phone: '', company: '', socialMedia: {} });
     setAddOpen(false);
     toast.success('Lead added');
   };
@@ -292,7 +292,7 @@ const Leads = () => {
       const emailIdx = headers.findIndex(h => h.includes('email'));
       const phoneIdx = headers.findIndex(h => h.includes('phone'));
       const companyIdx = headers.findIndex(h => h.includes('company'));
-      const sourceIdx = headers.findIndex(h => h.includes('source'));
+      
 
       let imported = 0;
       for (let i = 1; i < lines.length; i++) {
@@ -305,7 +305,6 @@ const Leads = () => {
           email: emailIdx >= 0 ? cols[emailIdx] : '',
           phone,
           company: companyIdx >= 0 ? cols[companyIdx] : '',
-          source: sourceIdx >= 0 ? cols[sourceIdx] : '',
           status: 'New',
           folderId: selectedFolder || undefined,
         });
@@ -321,7 +320,7 @@ const Leads = () => {
   const handleExport = () => {
     const data = folderLeads;
     if (data.length === 0) { toast.error('No leads to export'); return; }
-    const csv = ['Name,Email,Phone,Company,Source,Status', ...data.map(l => `${l.name},${l.email},${l.phone},${l.company || ''},${l.source || ''},${l.status}`)].join('\n');
+    const csv = ['Name,Email,Phone,Company,Status', ...data.map(l => `${l.name},${l.email},${l.phone},${l.company || ''},${l.status}`)].join('\n');
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -451,7 +450,7 @@ const Leads = () => {
                   <Input placeholder="Email" type="email" value={newLead.email} onChange={e => setNewLead(p => ({ ...p, email: e.target.value }))} />
                   <Input placeholder="Phone *" value={newLead.phone} onChange={e => setNewLead(p => ({ ...p, phone: sanitizePhone(e.target.value) }))} />
                   <Input placeholder="Company" value={newLead.company} onChange={e => setNewLead(p => ({ ...p, company: e.target.value }))} />
-                  <Input placeholder="Source" value={newLead.source} onChange={e => setNewLead(p => ({ ...p, source: e.target.value }))} />
+                  
                   <SocialMediaInputs social={newLead.socialMedia} onChange={s => setNewLead(p => ({ ...p, socialMedia: s }))} />
                   <Button onClick={handleAddLead} className="w-full">Add Lead</Button>
                 </div>
@@ -466,7 +465,7 @@ const Leads = () => {
         user={user}
         isManager={isManager}
         isTelecaller={false}
-        onEdit={(lead) => { setEditLeadId(lead.id); setEditLeadData({ name: lead.name, email: lead.email, phone: lead.phone, company: lead.company || '', source: lead.source || '', socialMedia: lead.socialMedia || {} }); }}
+        onEdit={(lead) => { setEditLeadId(lead.id); setEditLeadData({ name: lead.name, email: lead.email, phone: lead.phone, company: lead.company || '', socialMedia: lead.socialMedia || {} }); }}
         onDelete={(id) => { deleteLead(id); toast.success('Lead deleted'); }}
         onConvert={(lead) => { setConvertLead(lead); setProjectDetails({ projectName: `${lead.name} Project`, description: '' }); }}
       />
@@ -480,7 +479,7 @@ const Leads = () => {
             <Input placeholder="Email" type="email" value={editLeadData.email} onChange={e => setEditLeadData(p => ({ ...p, email: e.target.value }))} />
             <Input placeholder="Phone" value={editLeadData.phone} onChange={e => setEditLeadData(p => ({ ...p, phone: sanitizePhone(e.target.value) }))} />
             <Input placeholder="Company" value={editLeadData.company} onChange={e => setEditLeadData(p => ({ ...p, company: e.target.value }))} />
-            <Input placeholder="Source" value={editLeadData.source} onChange={e => setEditLeadData(p => ({ ...p, source: e.target.value }))} />
+            
             <SocialMediaInputs social={editLeadData.socialMedia} onChange={s => setEditLeadData(p => ({ ...p, socialMedia: s }))} />
             <Button onClick={handleUpdateLead} className="w-full">Save Changes</Button>
           </div>
