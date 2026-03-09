@@ -481,6 +481,7 @@ const Leads = () => {
             <Input placeholder="Phone" value={editLeadData.phone} onChange={e => setEditLeadData(p => ({ ...p, phone: sanitizePhone(e.target.value) }))} />
             <Input placeholder="Company" value={editLeadData.company} onChange={e => setEditLeadData(p => ({ ...p, company: e.target.value }))} />
             <Input placeholder="Source" value={editLeadData.source} onChange={e => setEditLeadData(p => ({ ...p, source: e.target.value }))} />
+            <SocialMediaInputs social={editLeadData.socialMedia} onChange={s => setEditLeadData(p => ({ ...p, socialMedia: s }))} />
             <Button onClick={handleUpdateLead} className="w-full">Save Changes</Button>
           </div>
         </DialogContent>
