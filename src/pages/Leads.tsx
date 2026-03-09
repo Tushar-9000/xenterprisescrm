@@ -556,6 +556,7 @@ const LeadTable = ({ leads, user, isManager, isTelecaller, onEdit, onDelete, onC
                 <th className="text-left py-3 px-4 text-muted-foreground font-medium">Name</th>
                 <th className="text-left py-3 px-4 text-muted-foreground font-medium">Phone</th>
                 <th className="text-left py-3 px-4 text-muted-foreground font-medium">Company</th>
+                <th className="text-left py-3 px-4 text-muted-foreground font-medium">Social</th>
                 <th className="text-left py-3 px-4 text-muted-foreground font-medium">Status</th>
                 {isManager && <th className="text-left py-3 px-4 text-muted-foreground font-medium">Assigned To</th>}
                 <th className="text-left py-3 px-4 text-muted-foreground font-medium">Actions</th>
@@ -563,7 +564,7 @@ const LeadTable = ({ leads, user, isManager, isTelecaller, onEdit, onDelete, onC
             </thead>
             <tbody>
               {leads.length === 0 ? (
-                <tr><td colSpan={isManager ? 6 : 5} className="text-center py-8 text-muted-foreground">No leads in this folder</td></tr>
+                <tr><td colSpan={isManager ? 7 : 6} className="text-center py-8 text-muted-foreground">No leads in this folder</td></tr>
               ) : leads.map((lead) => (
                 <tr key={lead.id} className="border-b border-border/50 hover:bg-secondary/30 transition-colors">
                   <td className="py-3 px-4 font-medium">{lead.name}</td>
