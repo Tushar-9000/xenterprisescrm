@@ -97,7 +97,7 @@ const Leads = () => {
   const [editLeadData, setEditLeadData] = useState({ name: '', email: '', phone: '', company: '', socialMedia: {} as LeadSocialMedia });
   const [noteOpen, setNoteOpen] = useState<string | null>(null);
   const [noteText, setNoteText] = useState('');
-  const [newLead, setNewLead] = useState({ name: '', email: '', phone: '', company: '', source: '', socialMedia: {} as LeadSocialMedia });
+  const [newLead, setNewLead] = useState({ name: '', email: '', phone: '', company: '', socialMedia: {} as LeadSocialMedia });
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [telecallerFolder, setTelecallerFolder] = useState<string | null>(null);
 
