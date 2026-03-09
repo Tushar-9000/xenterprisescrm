@@ -465,7 +465,7 @@ const Leads = () => {
         user={user}
         isManager={isManager}
         isTelecaller={false}
-        onEdit={(lead) => { setEditLeadId(lead.id); setEditLeadData({ name: lead.name, email: lead.email, phone: lead.phone, company: lead.company || '', source: lead.source || '' }); }}
+        onEdit={(lead) => { setEditLeadId(lead.id); setEditLeadData({ name: lead.name, email: lead.email, phone: lead.phone, company: lead.company || '', source: lead.source || '', socialMedia: lead.socialMedia || {} }); }}
         onDelete={(id) => { deleteLead(id); toast.success('Lead deleted'); }}
         onConvert={(lead) => { setConvertLead(lead); setProjectDetails({ projectName: `${lead.name} Project`, description: '' }); }}
       />
