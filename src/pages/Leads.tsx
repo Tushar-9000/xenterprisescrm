@@ -305,7 +305,6 @@ const Leads = () => {
           email: emailIdx >= 0 ? cols[emailIdx] : '',
           phone,
           company: companyIdx >= 0 ? cols[companyIdx] : '',
-          source: sourceIdx >= 0 ? cols[sourceIdx] : '',
           status: 'New',
           folderId: selectedFolder || undefined,
         });
