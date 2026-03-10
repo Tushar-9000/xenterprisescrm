@@ -10,11 +10,11 @@ import { Moon, Sun, BarChart3, Users, FolderOpen, TrendingUp, Eye, EyeOff } from
 const ROLE_ORDER: UserRole[] = ['admin', 'tech_lead', 'sales_manager', 'telecaller'];
 
 const HIGHLIGHTS = [
-  { icon: BarChart3, text: 'Lead pipeline & tracking' },
-  { icon: Users, text: 'Role-based team management' },
-  { icon: FolderOpen, text: 'Project-wise lead folders' },
-  { icon: TrendingUp, text: 'Performance analytics' },
-];
+{ icon: BarChart3, text: 'Lead pipeline & tracking' },
+{ icon: Users, text: 'Role-based team management' },
+{ icon: FolderOpen, text: 'Project-wise lead folders' },
+{ icon: TrendingUp, text: 'Performance analytics' }];
+
 
 const Login = () => {
   const { login } = useAuth();
@@ -37,8 +37,8 @@ const Login = () => {
       <button
         onClick={toggleTheme}
         className="absolute top-5 right-5 z-50 p-2.5 rounded-full bg-card border border-border text-foreground hover:bg-muted transition-colors"
-        aria-label="Toggle theme"
-      >
+        aria-label="Toggle theme">
+        
         {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
       </button>
 
@@ -48,32 +48,32 @@ const Login = () => {
           <h1 className="text-5xl font-extrabold tracking-tight mb-3">
             X Enterprise <span className="text-primary">CRM</span>
           </h1>
-          <p className="text-muted-foreground text-lg mb-10">
-            Real estate CRM for modern teams.
+          <p className="text-muted-foreground text-lg mb-10">Digital Marketing CRM for modern teams.
+
           </p>
 
           <div className="space-y-4 mb-10">
-            {HIGHLIGHTS.map((h) => (
-              <div key={h.text} className="flex items-center gap-3">
+            {HIGHLIGHTS.map((h) =>
+            <div key={h.text} className="flex items-center gap-3">
                 <div className="rounded-md bg-primary/10 p-2">
                   <h.icon className="h-4 w-4 text-primary" />
                 </div>
                 <p className="text-sm text-foreground">{h.text}</p>
               </div>
-            ))}
+            )}
           </div>
 
-          <div className="flex flex-wrap gap-2">
-            <span className="text-xs text-muted-foreground mr-1 self-center">Built for:</span>
-            {ROLE_ORDER.map((role) => (
-              <span
-                key={role}
-                className="rounded-full border border-border bg-secondary px-3 py-1 text-xs font-medium text-secondary-foreground"
-              >
-                {ROLE_LABELS[role]}
-              </span>
-            ))}
-          </div>
+          
+
+
+
+
+
+
+
+
+
+          
         </div>
       </div>
 
@@ -99,8 +99,8 @@ const Login = () => {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Your name"
-                className="mt-1 bg-secondary/10 border-border text-login-card-foreground placeholder:text-muted-foreground"
-              />
+                className="mt-1 bg-secondary/10 border-border text-login-card-foreground placeholder:text-muted-foreground" />
+              
             </div>
             <div>
               <label className="text-sm font-medium text-login-card-foreground">Email Address</label>
@@ -109,8 +109,8 @@ const Login = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="admin@enterprisecrm.com"
-                className="mt-1 bg-secondary/10 border-border text-login-card-foreground placeholder:text-muted-foreground"
-              />
+                className="mt-1 bg-secondary/10 border-border text-login-card-foreground placeholder:text-muted-foreground" />
+              
             </div>
             <div>
               <label className="text-sm font-medium text-login-card-foreground">Password</label>
@@ -120,13 +120,13 @@ const Login = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="bg-secondary/10 border-border text-login-card-foreground placeholder:text-muted-foreground pr-10"
-                />
+                  className="bg-secondary/10 border-border text-login-card-foreground placeholder:text-muted-foreground pr-10" />
+                
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                >
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors">
+                  
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>
@@ -140,25 +140,25 @@ const Login = () => {
           {/* Quick login */}
           <div className="mt-8 space-y-1">
             <p className="text-xs text-muted-foreground mb-2 text-center uppercase tracking-wider">Quick fill by role</p>
-            {MOCK_USERS.map((u) => (
-              <button
-                key={u.id}
-                onClick={() => {
-                  setName(u.name);
-                  setEmail(u.email);
-                  setPassword(u.password || `${u.name}123`);
-                }}
-                className="w-full flex items-center justify-between px-4 py-3 rounded-md text-login-card-foreground hover:bg-secondary/10 transition-colors group"
-              >
+            {MOCK_USERS.map((u) =>
+            <button
+              key={u.id}
+              onClick={() => {
+                setName(u.name);
+                setEmail(u.email);
+                setPassword(u.password || `${u.name}123`);
+              }}
+              className="w-full flex items-center justify-between px-4 py-3 rounded-md text-login-card-foreground hover:bg-secondary/10 transition-colors group">
+              
                 <span className="font-medium text-sm">{u.name}</span>
                 <span className="text-xs text-primary opacity-70 group-hover:opacity-100 transition-opacity">{ROLE_LABELS[u.role]}</span>
               </button>
-            ))}
+            )}
           </div>
         </div>
       </div>
-    </div>
-  );
+    </div>);
+
 };
 
 export default Login;
