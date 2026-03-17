@@ -471,15 +471,15 @@ const Leads = () => {
       <Dialog open={!!editLeadId} onOpenChange={(o) => { if (!o) setEditLeadId(null); }}>
         <DialogContent className="bg-card border-border">
           <DialogHeader><DialogTitle>Edit Lead</DialogTitle></DialogHeader>
-          <div className="space-y-3">
+          <form onSubmit={(e) => { e.preventDefault(); handleUpdateLead(); }} className="space-y-3">
             <Input placeholder="Name" value={editLeadData.name} onChange={e => setEditLeadData(p => ({ ...p, name: e.target.value }))} />
             <Input placeholder="Email" type="email" value={editLeadData.email} onChange={e => setEditLeadData(p => ({ ...p, email: e.target.value }))} />
             <Input placeholder="Phone" value={editLeadData.phone} onChange={e => setEditLeadData(p => ({ ...p, phone: sanitizePhone(e.target.value) }))} />
             <Input placeholder="Company" value={editLeadData.company} onChange={e => setEditLeadData(p => ({ ...p, company: e.target.value }))} />
             
             <SocialMediaInputs social={editLeadData.socialMedia} onChange={s => setEditLeadData(p => ({ ...p, socialMedia: s }))} />
-            <Button onClick={handleUpdateLead} className="w-full">Save Changes</Button>
-          </div>
+            <Button type="submit" className="w-full">Save Changes</Button>
+          </form>
         </DialogContent>
       </Dialog>
       {/* Project Request Dialog */}

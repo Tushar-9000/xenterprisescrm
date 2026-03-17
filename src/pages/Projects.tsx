@@ -14,7 +14,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Calendar } from '@/components/ui/calendar';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
-import { Plus, Trash2, UserPlus, Pencil, CalendarIcon } from 'lucide-react';
+import { Plus, Trash2, UserPlus, Pencil, CalendarIcon, ArrowLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const PROJECT_STATUSES: ProjectStatus[] = ['Planning', 'In Progress', 'Review', 'Completed', 'On Hold'];
