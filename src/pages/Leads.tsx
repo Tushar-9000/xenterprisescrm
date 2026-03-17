@@ -608,9 +608,6 @@ const LeadTable = ({ leads, user, isManager, isTelecaller, onEdit, onDelete, onC
                   )}
                   <td className="py-3 px-4">
                     <div className="flex gap-1">
-                      <Button size="sm" variant="ghost" onClick={() => openWhatsApp(lead.phone)} title="WhatsApp">
-                        <MessageCircle className="h-4 w-4 text-success" />
-                      </Button>
                       <Dialog open={noteOpen === lead.id} onOpenChange={(o) => { setNoteOpen(o ? lead.id : null); setNoteText(''); }}>
                         <DialogTrigger asChild>
                           <Button size="sm" variant="ghost">Notes ({lead.notes.length})</Button>
