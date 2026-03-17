@@ -103,6 +103,7 @@ function getNavItems(role: string) {
         { path: '/developers', label: 'Developers', icon: UserCircle },
         { path: '/users', label: 'User Management', icon: Users },
         { path: '/notifications', label: 'Notifications', icon: Bell },
+        { path: '/history', label: 'Activity History', icon: History },
         { path: '/settings', label: 'Settings', icon: Settings },
       ];
     case 'sales_manager':
