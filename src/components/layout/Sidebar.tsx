@@ -5,7 +5,7 @@ import { ROLE_LABELS } from '@/types/crm';
 import { Link, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard, Users, FolderKanban, Bell, Trophy,
-  Settings, LogOut, Phone, UserCircle, Moon, Sun, FileCheck
+  Settings, LogOut, Phone, UserCircle, Moon, Sun, FileCheck, History
 } from 'lucide-react';
 
 const Sidebar = () => {
