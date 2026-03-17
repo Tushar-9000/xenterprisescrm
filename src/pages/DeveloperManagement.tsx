@@ -62,8 +62,10 @@ const DeveloperManagement = () => {
           </DialogTrigger>
           <DialogContent className="bg-card border-border">
             <DialogHeader><DialogTitle>Add Developer</DialogTitle></DialogHeader>
-            <Input placeholder="Developer Name" value={newDevName} onChange={e => setNewDevName(e.target.value)} />
-            <Button onClick={handleAddDev}>Add</Button>
+            <form onSubmit={(e) => { e.preventDefault(); handleAddDev(); }} className="space-y-3">
+              <Input placeholder="Developer Name" value={newDevName} onChange={e => setNewDevName(e.target.value)} />
+              <Button type="submit">Add</Button>
+            </form>
           </DialogContent>
         </Dialog>
       </div>
