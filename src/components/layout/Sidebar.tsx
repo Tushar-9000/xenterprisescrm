@@ -117,6 +117,7 @@ function getNavItems(role: string) {
       return [...common,
         { path: '/my-leads', label: 'My Leads', icon: Phone },
         { path: '/notifications', label: 'Notifications', icon: Bell },
+        { path: '/history', label: 'Activity History', icon: History },
       ];
     case 'tech_lead':
       return [...common,
