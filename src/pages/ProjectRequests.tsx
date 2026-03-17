@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
-import { CheckCircle2, XCircle, Clock, FileText, User as UserIcon, Mail, Phone } from 'lucide-react';
+import { CheckCircle2, XCircle, Clock, FileText, User as UserIcon, Mail, Phone, ArrowLeft } from 'lucide-react';
 
 const ProjectRequests = () => {
   const { user } = useAuth();
@@ -50,11 +50,16 @@ const ProjectRequests = () => {
 
   return (
     <div className="space-y-6 animate-fade-in">
-      <div>
-        <h1 className="text-3xl font-bold">Project Requests</h1>
-        <p className="text-muted-foreground mt-1">
-          {isAdmin ? `${pending.length} pending approval` : `${projectRequests.filter(r => r.requestedBy === user.id).length} requests submitted`}
-        </p>
+      <div className="flex items-center gap-3">
+        <Button variant="ghost" size="icon" onClick={() => window.history.back()}>
+          <ArrowLeft className="h-4 w-4" />
+        </Button>
+        <div>
+          <h1 className="text-3xl font-bold">Project Requests</h1>
+          <p className="text-muted-foreground mt-1">
+            {isAdmin ? `${pending.length} pending approval` : `${projectRequests.filter(r => r.requestedBy === user.id).length} requests submitted`}
+          </p>
+        </div>
       </div>
 
       {/* Pending Requests */}

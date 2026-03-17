@@ -18,6 +18,7 @@ import LeadStatus from "./pages/LeadStatus";
 import SettingsPage from "./pages/SettingsPage";
 import ProjectRequests from "./pages/ProjectRequests";
 import Profile from "./pages/Profile";
+import ActivityHistory from "./pages/ActivityHistory";
 import AppLayout from "./components/layout/AppLayout";
 import NotFound from "./pages/NotFound";
 
@@ -48,6 +49,7 @@ const AppRoutes = () => {
         <Route path="/users" element={<UserManagement />} />
         <Route path="/settings" element={<SettingsPage />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/history" element={<ActivityHistory />} />
       </Route>
       <Route path="*" element={<NotFound />} />
     </Routes>

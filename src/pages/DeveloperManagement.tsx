@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus, Trash2, Pencil, Code2 } from 'lucide-react';
+import { Plus, Trash2, Pencil, Code2, ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
 
 const DeveloperManagement = () => {
@@ -47,9 +47,14 @@ const DeveloperManagement = () => {
   return (
     <div className="space-y-6 animate-fade-in">
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">Developer Management</h1>
-          <p className="text-muted-foreground mt-1">{developers.length} developers</p>
+        <div className="flex items-center gap-3">
+          <Button variant="ghost" size="icon" onClick={() => window.history.back()}>
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+          <div>
+            <h1 className="text-3xl font-bold">Developer Management</h1>
+            <p className="text-muted-foreground mt-1">{developers.length} developers</p>
+          </div>
         </div>
         <Dialog open={addDevOpen} onOpenChange={setAddDevOpen}>
           <DialogTrigger asChild>
@@ -57,8 +62,10 @@ const DeveloperManagement = () => {
           </DialogTrigger>
           <DialogContent className="bg-card border-border">
             <DialogHeader><DialogTitle>Add Developer</DialogTitle></DialogHeader>
-            <Input placeholder="Developer Name" value={newDevName} onChange={e => setNewDevName(e.target.value)} />
-            <Button onClick={handleAddDev}>Add</Button>
+            <form onSubmit={(e) => { e.preventDefault(); handleAddDev(); }} className="space-y-3">
+              <Input placeholder="Developer Name" value={newDevName} onChange={e => setNewDevName(e.target.value)} />
+              <Button type="submit">Add</Button>
+            </form>
           </DialogContent>
         </Dialog>
       </div>

@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-import { UserCircle, Plus, Trash2, Pencil, Mail, Phone, Calendar, ExternalLink } from 'lucide-react';
+import { UserCircle, Plus, Trash2, Pencil, Mail, Phone, Calendar, ExternalLink, ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
 
 const UserManagement = () => {
@@ -47,9 +47,14 @@ const UserManagement = () => {
   return (
     <div className="space-y-6 animate-fade-in">
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">User Management</h1>
-          <p className="text-muted-foreground mt-1">{users.length} users</p>
+        <div className="flex items-center gap-3">
+          <Button variant="ghost" size="icon" onClick={() => window.history.back()}>
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+          <div>
+            <h1 className="text-3xl font-bold">User Management</h1>
+            <p className="text-muted-foreground mt-1">{users.length} users</p>
+          </div>
         </div>
         <Dialog open={addOpen} onOpenChange={setAddOpen}>
           <DialogTrigger asChild>
@@ -57,7 +62,7 @@ const UserManagement = () => {
           </DialogTrigger>
           <DialogContent className="bg-card border-border">
             <DialogHeader><DialogTitle>Add New User</DialogTitle></DialogHeader>
-            <div className="space-y-3">
+            <form onSubmit={(e) => { e.preventDefault(); handleAdd(); }} className="space-y-3">
               <Input placeholder="Full Name *" value={newUser.name} onChange={e => setNewUser(p => ({ ...p, name: e.target.value }))} />
               <Input placeholder="Email *" type="email" value={newUser.email} onChange={e => setNewUser(p => ({ ...p, email: e.target.value }))} />
               <Input placeholder="Phone" value={newUser.phone} onChange={e => setNewUser(p => ({ ...p, phone: sanitizePhone(e.target.value) }))} />
@@ -70,8 +75,8 @@ const UserManagement = () => {
                 </SelectContent>
               </Select>
               <Input type="date" placeholder="Joining Date" value={newUser.joiningDate} onChange={e => setNewUser(p => ({ ...p, joiningDate: e.target.value }))} />
-              <Button onClick={handleAdd} className="w-full">Add User</Button>
-            </div>
+              <Button type="submit" className="w-full">Add User</Button>
+            </form>
           </DialogContent>
         </Dialog>
       </div>

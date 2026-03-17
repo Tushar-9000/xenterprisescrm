@@ -5,7 +5,7 @@ import { ROLE_LABELS } from '@/types/crm';
 import { Link, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard, Users, FolderKanban, Bell, Trophy,
-  Settings, LogOut, Phone, UserCircle, Moon, Sun, FileCheck
+  Settings, LogOut, Phone, UserCircle, Moon, Sun, FileCheck, History
 } from 'lucide-react';
 
 const Sidebar = () => {
@@ -103,6 +103,7 @@ function getNavItems(role: string) {
         { path: '/developers', label: 'Developers', icon: UserCircle },
         { path: '/users', label: 'User Management', icon: Users },
         { path: '/notifications', label: 'Notifications', icon: Bell },
+        { path: '/history', label: 'Activity History', icon: History },
         { path: '/settings', label: 'Settings', icon: Settings },
       ];
     case 'sales_manager':
@@ -110,17 +111,20 @@ function getNavItems(role: string) {
         { path: '/leads', label: 'Leads', icon: Phone },
         { path: '/leaderboard', label: 'Leaderboard', icon: Trophy },
         { path: '/notifications', label: 'Notifications', icon: Bell },
+        { path: '/history', label: 'Activity History', icon: History },
       ];
     case 'telecaller':
       return [...common,
         { path: '/my-leads', label: 'My Leads', icon: Phone },
         { path: '/notifications', label: 'Notifications', icon: Bell },
+        { path: '/history', label: 'Activity History', icon: History },
       ];
     case 'tech_lead':
       return [...common,
         { path: '/projects', label: 'Projects', icon: FolderKanban },
         { path: '/lead-status', label: 'Lead Status', icon: Phone },
         { path: '/notifications', label: 'Notifications', icon: Bell },
+        { path: '/history', label: 'Activity History', icon: History },
       ];
     default:
       return common;

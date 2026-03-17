@@ -14,7 +14,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Calendar } from '@/components/ui/calendar';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
-import { Plus, Trash2, UserPlus, Pencil, CalendarIcon } from 'lucide-react';
+import { Plus, Trash2, UserPlus, Pencil, CalendarIcon, ArrowLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const PROJECT_STATUSES: ProjectStatus[] = ['Planning', 'In Progress', 'Review', 'Completed', 'On Hold'];
@@ -89,9 +89,14 @@ const Projects = () => {
   return (
     <div className="space-y-6 animate-fade-in">
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">Projects</h1>
-          <p className="text-muted-foreground mt-1">{projects.length} projects</p>
+        <div className="flex items-center gap-3">
+          <Button variant="ghost" size="icon" onClick={() => window.history.back()}>
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+          <div>
+            <h1 className="text-3xl font-bold">Projects</h1>
+            <p className="text-muted-foreground mt-1">{projects.length} projects</p>
+          </div>
         </div>
         {isTechLead && (
           <Dialog open={addOpen} onOpenChange={setAddOpen}>
@@ -100,13 +105,13 @@ const Projects = () => {
             </DialogTrigger>
             <DialogContent className="bg-card border-border">
               <DialogHeader><DialogTitle>Create New Project</DialogTitle></DialogHeader>
-              <div className="space-y-3">
+              <form onSubmit={(e) => { e.preventDefault(); handleAddProject(); }} className="space-y-3">
                 <Input placeholder="Project Name *" value={newProject.name} onChange={e => setNewProject(p => ({ ...p, name: e.target.value }))} />
                 <Input placeholder="Client Name *" value={newProject.clientName} onChange={e => setNewProject(p => ({ ...p, clientName: e.target.value }))} />
                 <Input placeholder="Client Email *" type="email" value={newProject.clientEmail} onChange={e => setNewProject(p => ({ ...p, clientEmail: e.target.value }))} />
                 <Input placeholder="Client Phone" value={newProject.clientPhone} onChange={e => setNewProject(p => ({ ...p, clientPhone: sanitizePhone(e.target.value) }))} />
-                <Button onClick={handleAddProject} className="w-full">Create Project</Button>
-              </div>
+                <Button type="submit" className="w-full">Create Project</Button>
+              </form>
             </DialogContent>
           </Dialog>
         )}
@@ -135,8 +140,10 @@ const Projects = () => {
                           </DialogTrigger>
                           <DialogContent className="bg-card border-border">
                             <DialogHeader><DialogTitle>Rename Project</DialogTitle></DialogHeader>
-                            <Input value={renameText} onChange={e => setRenameText(e.target.value)} placeholder="New project name" />
-                            <Button onClick={() => handleRename(project.id)}>Save</Button>
+                            <form onSubmit={(e) => { e.preventDefault(); handleRename(project.id); }} className="space-y-3">
+                              <Input value={renameText} onChange={e => setRenameText(e.target.value)} placeholder="New project name" />
+                              <Button type="submit">Save</Button>
+                            </form>
                           </DialogContent>
                         </Dialog>
                       )}

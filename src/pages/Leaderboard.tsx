@@ -1,7 +1,9 @@
+import { useNavigate } from 'react-router-dom';
 import { useCRM } from '@/context/CRMContext';
 import { MOCK_USERS } from '@/types/crm';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Trophy } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Trophy, ArrowLeft } from 'lucide-react';
 
 const Leaderboard = () => {
   const { leads } = useCRM();
@@ -19,7 +21,12 @@ const Leaderboard = () => {
 
   return (
     <div className="space-y-6 animate-fade-in">
-      <h1 className="text-3xl font-bold">Leaderboard</h1>
+      <div className="flex items-center gap-3">
+        <Button variant="ghost" size="icon" onClick={() => window.history.back()}>
+          <ArrowLeft className="h-4 w-4" />
+        </Button>
+        <h1 className="text-3xl font-bold">Leaderboard</h1>
+      </div>
       <div className="space-y-3">
         {rankings.map((tc, i) => (
           <Card key={tc.id} className="bg-card border-border">

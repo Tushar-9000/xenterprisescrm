@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Textarea } from '@/components/ui/textarea';
-import { Plus, MessageCircle, FolderPlus, Trash2, Pencil, ArrowLeft, Upload, Download, FolderOpen, MapPin } from 'lucide-react';
+import { Plus, FolderPlus, Trash2, Pencil, ArrowLeft, Upload, Download, FolderOpen, MapPin } from 'lucide-react';
 import { toast } from 'sonner';
 
 const InstagramIcon = ({ className }: { className?: string }) => (
@@ -273,10 +273,7 @@ const Leads = () => {
     toast.success('Note added');
   };
 
-  const openWhatsApp = (phone: string) => {
-    const cleaned = phone.replace(/\D/g, '');
-    window.open(`https://wa.me/${cleaned}`, '_blank');
-  };
+  // removed openWhatsApp
 
   // Import from CSV/sheet
   const handleImport = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -347,11 +344,11 @@ const Leads = () => {
               </DialogTrigger>
               <DialogContent className="bg-card border-border">
                 <DialogHeader><DialogTitle>Create Lead Folder</DialogTitle></DialogHeader>
-                <div className="space-y-3">
+                <form onSubmit={(e) => { e.preventDefault(); handleCreateFolder(); }} className="space-y-3">
                   <Input placeholder="Folder / Business Name *" value={folderName} onChange={e => setFolderName(e.target.value)} />
                   <Input placeholder="Location" value={folderLocation} onChange={e => setFolderLocation(e.target.value)} />
-                  <Button onClick={handleCreateFolder} className="w-full">Create Folder</Button>
-                </div>
+                  <Button type="submit" className="w-full">Create Folder</Button>
+                </form>
               </DialogContent>
             </Dialog>
           )}
@@ -445,15 +442,15 @@ const Leads = () => {
               </DialogTrigger>
               <DialogContent className="bg-card border-border">
                 <DialogHeader><DialogTitle>Add Lead to {currentFolder?.name}</DialogTitle></DialogHeader>
-                <div className="space-y-3">
+                <form onSubmit={(e) => { e.preventDefault(); handleAddLead(); }} className="space-y-3">
                   <Input placeholder="Name *" value={newLead.name} onChange={e => setNewLead(p => ({ ...p, name: e.target.value }))} />
                   <Input placeholder="Email" type="email" value={newLead.email} onChange={e => setNewLead(p => ({ ...p, email: e.target.value }))} />
                   <Input placeholder="Phone *" value={newLead.phone} onChange={e => setNewLead(p => ({ ...p, phone: sanitizePhone(e.target.value) }))} />
                   <Input placeholder="Company" value={newLead.company} onChange={e => setNewLead(p => ({ ...p, company: e.target.value }))} />
                   
                   <SocialMediaInputs social={newLead.socialMedia} onChange={s => setNewLead(p => ({ ...p, socialMedia: s }))} />
-                  <Button onClick={handleAddLead} className="w-full">Add Lead</Button>
-                </div>
+                  <Button type="submit" className="w-full">Add Lead</Button>
+                </form>
               </DialogContent>
             </Dialog>
           )}
@@ -474,15 +471,15 @@ const Leads = () => {
       <Dialog open={!!editLeadId} onOpenChange={(o) => { if (!o) setEditLeadId(null); }}>
         <DialogContent className="bg-card border-border">
           <DialogHeader><DialogTitle>Edit Lead</DialogTitle></DialogHeader>
-          <div className="space-y-3">
+          <form onSubmit={(e) => { e.preventDefault(); handleUpdateLead(); }} className="space-y-3">
             <Input placeholder="Name" value={editLeadData.name} onChange={e => setEditLeadData(p => ({ ...p, name: e.target.value }))} />
             <Input placeholder="Email" type="email" value={editLeadData.email} onChange={e => setEditLeadData(p => ({ ...p, email: e.target.value }))} />
             <Input placeholder="Phone" value={editLeadData.phone} onChange={e => setEditLeadData(p => ({ ...p, phone: sanitizePhone(e.target.value) }))} />
             <Input placeholder="Company" value={editLeadData.company} onChange={e => setEditLeadData(p => ({ ...p, company: e.target.value }))} />
             
             <SocialMediaInputs social={editLeadData.socialMedia} onChange={s => setEditLeadData(p => ({ ...p, socialMedia: s }))} />
-            <Button onClick={handleUpdateLead} className="w-full">Save Changes</Button>
-          </div>
+            <Button type="submit" className="w-full">Save Changes</Button>
+          </form>
         </DialogContent>
       </Dialog>
       {/* Project Request Dialog */}
@@ -541,9 +538,7 @@ const LeadTable = ({ leads, user, isManager, isTelecaller, onEdit, onDelete, onC
     toast.success('Note added');
   };
 
-  const openWhatsApp = (phone: string) => {
-    window.open(`https://wa.me/${phone.replace(/\D/g, '')}`, '_blank');
-  };
+  // removed openWhatsApp from LeadTable
 
   return (
     <Card className="bg-card border-border">
@@ -613,9 +608,6 @@ const LeadTable = ({ leads, user, isManager, isTelecaller, onEdit, onDelete, onC
                   )}
                   <td className="py-3 px-4">
                     <div className="flex gap-1">
-                      <Button size="sm" variant="ghost" onClick={() => openWhatsApp(lead.phone)} title="WhatsApp">
-                        <MessageCircle className="h-4 w-4 text-success" />
-                      </Button>
                       <Dialog open={noteOpen === lead.id} onOpenChange={(o) => { setNoteOpen(o ? lead.id : null); setNoteText(''); }}>
                         <DialogTrigger asChild>
                           <Button size="sm" variant="ghost">Notes ({lead.notes.length})</Button>

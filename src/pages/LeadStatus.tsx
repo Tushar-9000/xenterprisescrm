@@ -1,8 +1,9 @@
 import { useCRM } from '@/context/CRMContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { LeadStatus as LeadStatusType } from '@/types/crm';
-import { Users, Phone, Building2 } from 'lucide-react';
+import { Users, Phone, Building2, ArrowLeft } from 'lucide-react';
 
 const STATUS_COLORS: Record<LeadStatusType, string> = {
   'New': 'bg-blue-500/10 text-blue-500 border-blue-500/20',
@@ -22,9 +23,14 @@ const LeadStatus = () => {
 
   return (
     <div className="space-y-6 animate-fade-in">
-      <div>
-        <h1 className="text-3xl font-bold">Lead Status Overview</h1>
-        <p className="text-muted-foreground mt-1">{leads.length} total leads</p>
+      <div className="flex items-center gap-3">
+        <Button variant="ghost" size="icon" onClick={() => window.history.back()}>
+          <ArrowLeft className="h-4 w-4" />
+        </Button>
+        <div>
+          <h1 className="text-3xl font-bold">Lead Status Overview</h1>
+          <p className="text-muted-foreground mt-1">{leads.length} total leads</p>
+        </div>
       </div>
 
       {/* Status summary cards */}
