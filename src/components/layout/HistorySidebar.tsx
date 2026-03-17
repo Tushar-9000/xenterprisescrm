@@ -1,12 +1,13 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useCRM } from '@/context/CRMContext';
 import { Activity, ActivityType } from '@/types/crm';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import {
   History, X, UserPlus, Edit, Trash2, ArrowRightLeft, FolderPlus,
-  FolderMinus, FileCheck, FileX, Phone, FolderKanban, UserCircle
+  FolderMinus, FileCheck, FileX, Phone, FolderKanban, UserCircle, Search
 } from 'lucide-react';
 
 const ACTIVITY_ICONS: Partial<Record<ActivityType, React.ElementType>> = {
