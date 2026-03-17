@@ -344,11 +344,11 @@ const Leads = () => {
               </DialogTrigger>
               <DialogContent className="bg-card border-border">
                 <DialogHeader><DialogTitle>Create Lead Folder</DialogTitle></DialogHeader>
-                <div className="space-y-3">
+                <form onSubmit={(e) => { e.preventDefault(); handleCreateFolder(); }} className="space-y-3">
                   <Input placeholder="Folder / Business Name *" value={folderName} onChange={e => setFolderName(e.target.value)} />
                   <Input placeholder="Location" value={folderLocation} onChange={e => setFolderLocation(e.target.value)} />
-                  <Button onClick={handleCreateFolder} className="w-full">Create Folder</Button>
-                </div>
+                  <Button type="submit" className="w-full">Create Folder</Button>
+                </form>
               </DialogContent>
             </Dialog>
           )}
