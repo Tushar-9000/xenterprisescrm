@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
-import { CheckCircle2, XCircle, Clock, FileText, User as UserIcon, Mail, Phone } from 'lucide-react';
+import { CheckCircle2, XCircle, Clock, FileText, User as UserIcon, Mail, Phone, ArrowLeft } from 'lucide-react';
 
 const ProjectRequests = () => {
   const { user } = useAuth();
