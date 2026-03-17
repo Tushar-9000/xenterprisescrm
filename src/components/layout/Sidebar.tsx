@@ -111,6 +111,7 @@ function getNavItems(role: string) {
         { path: '/leads', label: 'Leads', icon: Phone },
         { path: '/leaderboard', label: 'Leaderboard', icon: Trophy },
         { path: '/notifications', label: 'Notifications', icon: Bell },
+        { path: '/history', label: 'Activity History', icon: History },
       ];
     case 'telecaller':
       return [...common,
