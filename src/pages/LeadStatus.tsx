@@ -1,8 +1,9 @@
 import { useCRM } from '@/context/CRMContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { LeadStatus as LeadStatusType } from '@/types/crm';
-import { Users, Phone, Building2 } from 'lucide-react';
+import { Users, Phone, Building2, ArrowLeft } from 'lucide-react';
 
 const STATUS_COLORS: Record<LeadStatusType, string> = {
   'New': 'bg-blue-500/10 text-blue-500 border-blue-500/20',
