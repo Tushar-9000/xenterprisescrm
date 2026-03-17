@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-import { UserCircle, Plus, Trash2, Pencil, Mail, Phone, Calendar, ExternalLink } from 'lucide-react';
+import { UserCircle, Plus, Trash2, Pencil, Mail, Phone, Calendar, ExternalLink, ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
 
 const UserManagement = () => {
