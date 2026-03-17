@@ -135,8 +135,10 @@ const Projects = () => {
                           </DialogTrigger>
                           <DialogContent className="bg-card border-border">
                             <DialogHeader><DialogTitle>Rename Project</DialogTitle></DialogHeader>
-                            <Input value={renameText} onChange={e => setRenameText(e.target.value)} placeholder="New project name" />
-                            <Button onClick={() => handleRename(project.id)}>Save</Button>
+                            <form onSubmit={(e) => { e.preventDefault(); handleRename(project.id); }} className="space-y-3">
+                              <Input value={renameText} onChange={e => setRenameText(e.target.value)} placeholder="New project name" />
+                              <Button type="submit">Save</Button>
+                            </form>
                           </DialogContent>
                         </Dialog>
                       )}
