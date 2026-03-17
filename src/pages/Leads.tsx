@@ -538,9 +538,7 @@ const LeadTable = ({ leads, user, isManager, isTelecaller, onEdit, onDelete, onC
     toast.success('Note added');
   };
 
-  const openWhatsApp = (phone: string) => {
-    window.open(`https://wa.me/${phone.replace(/\D/g, '')}`, '_blank');
-  };
+  // removed openWhatsApp from LeadTable
 
   return (
     <Card className="bg-card border-border">
