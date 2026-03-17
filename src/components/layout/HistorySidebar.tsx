@@ -124,7 +124,19 @@ const HistorySidebar = () => {
           </Button>
         </div>
 
-        <ScrollArea className="h-[calc(100%-57px)]">
+        <div className="p-3 border-b border-border">
+          <div className="relative">
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+            <Input
+              placeholder="Search activities..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="h-8 pl-8 text-xs"
+            />
+          </div>
+        </div>
+
+        <ScrollArea className="h-[calc(100%-113px)]">
           {filtered.length === 0 ? (
             <div className="p-8 text-center">
               <History className="h-10 w-10 text-muted-foreground mx-auto mb-3 opacity-40" />
