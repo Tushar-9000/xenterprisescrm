@@ -62,7 +62,7 @@ const UserManagement = () => {
           </DialogTrigger>
           <DialogContent className="bg-card border-border">
             <DialogHeader><DialogTitle>Add New User</DialogTitle></DialogHeader>
-            <div className="space-y-3">
+            <form onSubmit={(e) => { e.preventDefault(); handleAdd(); }} className="space-y-3">
               <Input placeholder="Full Name *" value={newUser.name} onChange={e => setNewUser(p => ({ ...p, name: e.target.value }))} />
               <Input placeholder="Email *" type="email" value={newUser.email} onChange={e => setNewUser(p => ({ ...p, email: e.target.value }))} />
               <Input placeholder="Phone" value={newUser.phone} onChange={e => setNewUser(p => ({ ...p, phone: sanitizePhone(e.target.value) }))} />
@@ -75,8 +75,8 @@ const UserManagement = () => {
                 </SelectContent>
               </Select>
               <Input type="date" placeholder="Joining Date" value={newUser.joiningDate} onChange={e => setNewUser(p => ({ ...p, joiningDate: e.target.value }))} />
-              <Button onClick={handleAdd} className="w-full">Add User</Button>
-            </div>
+              <Button type="submit" className="w-full">Add User</Button>
+            </form>
           </DialogContent>
         </Dialog>
       </div>
