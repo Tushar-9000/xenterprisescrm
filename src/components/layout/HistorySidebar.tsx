@@ -78,16 +78,17 @@ const HistorySidebar = () => {
   const { user } = useAuth();
   const { activities } = useCRM();
 
-  if (!user) return null;
-
   const filtered = useMemo(() => {
+    if (!user) return [];
     const roleFiltered = filterActivities(activities, user.role, user.id);
     if (!search.trim()) return roleFiltered;
     const q = search.toLowerCase();
     return roleFiltered.filter(a =>
       a.title.toLowerCase().includes(q) || a.description.toLowerCase().includes(q)
     );
-  }, [activities, user.role, user.id, search]);
+  }, [activities, user, search]);
+
+  if (!user) return null;
 
   return (
     <>
