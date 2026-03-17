@@ -18,6 +18,7 @@ import LeadStatus from "./pages/LeadStatus";
 import SettingsPage from "./pages/SettingsPage";
 import ProjectRequests from "./pages/ProjectRequests";
 import Profile from "./pages/Profile";
+import ActivityHistory from "./pages/ActivityHistory";
 import AppLayout from "./components/layout/AppLayout";
 import NotFound from "./pages/NotFound";
 
