@@ -273,10 +273,7 @@ const Leads = () => {
     toast.success('Note added');
   };
 
-  const openWhatsApp = (phone: string) => {
-    const cleaned = phone.replace(/\D/g, '');
-    window.open(`https://wa.me/${cleaned}`, '_blank');
-  };
+  // removed openWhatsApp
 
   // Import from CSV/sheet
   const handleImport = (e: React.ChangeEvent<HTMLInputElement>) => {
