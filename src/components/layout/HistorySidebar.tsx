@@ -1,12 +1,13 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useCRM } from '@/context/CRMContext';
 import { Activity, ActivityType } from '@/types/crm';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import {
   History, X, UserPlus, Edit, Trash2, ArrowRightLeft, FolderPlus,
-  FolderMinus, FileCheck, FileX, Phone, FolderKanban, UserCircle
+  FolderMinus, FileCheck, FileX, Phone, FolderKanban, UserCircle, Search
 } from 'lucide-react';
 
 const ACTIVITY_ICONS: Partial<Record<ActivityType, React.ElementType>> = {
@@ -73,12 +74,21 @@ function filterActivities(activities: Activity[], role: string, userId: string):
 
 const HistorySidebar = () => {
   const [open, setOpen] = useState(false);
+  const [search, setSearch] = useState('');
   const { user } = useAuth();
   const { activities } = useCRM();
 
-  if (!user) return null;
+  const filtered = useMemo(() => {
+    if (!user) return [];
+    const roleFiltered = filterActivities(activities, user.role, user.id);
+    if (!search.trim()) return roleFiltered;
+    const q = search.toLowerCase();
+    return roleFiltered.filter(a =>
+      a.title.toLowerCase().includes(q) || a.description.toLowerCase().includes(q)
+    );
+  }, [activities, user, search]);
 
-  const filtered = filterActivities(activities, user.role, user.id);
+  if (!user) return null;
 
   return (
     <>
@@ -114,7 +124,19 @@ const HistorySidebar = () => {
           </Button>
         </div>
 
-        <ScrollArea className="h-[calc(100%-57px)]">
+        <div className="p-3 border-b border-border">
+          <div className="relative">
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+            <Input
+              placeholder="Search activities..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="h-8 pl-8 text-xs"
+            />
+          </div>
+        </div>
+
+        <ScrollArea className="h-[calc(100%-113px)]">
           {filtered.length === 0 ? (
             <div className="p-8 text-center">
               <History className="h-10 w-10 text-muted-foreground mx-auto mb-3 opacity-40" />
