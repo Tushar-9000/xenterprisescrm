@@ -124,6 +124,7 @@ function getNavItems(role: string) {
         { path: '/projects', label: 'Projects', icon: FolderKanban },
         { path: '/lead-status', label: 'Lead Status', icon: Phone },
         { path: '/notifications', label: 'Notifications', icon: Bell },
+        { path: '/history', label: 'Activity History', icon: History },
       ];
     default:
       return common;

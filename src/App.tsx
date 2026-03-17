@@ -49,6 +49,7 @@ const AppRoutes = () => {
         <Route path="/users" element={<UserManagement />} />
         <Route path="/settings" element={<SettingsPage />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/history" element={<ActivityHistory />} />
       </Route>
       <Route path="*" element={<NotFound />} />
     </Routes>

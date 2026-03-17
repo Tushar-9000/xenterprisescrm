@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Textarea } from '@/components/ui/textarea';
-import { Plus, MessageCircle, FolderPlus, Trash2, Pencil, ArrowLeft, Upload, Download, FolderOpen, MapPin } from 'lucide-react';
+import { Plus, FolderPlus, Trash2, Pencil, ArrowLeft, Upload, Download, FolderOpen, MapPin } from 'lucide-react';
 import { toast } from 'sonner';
 
 const InstagramIcon = ({ className }: { className?: string }) => (
