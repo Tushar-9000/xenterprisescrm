@@ -29,7 +29,7 @@ interface CRMContextType {
   addDeveloper: (name: string) => void;
   removeDeveloper: (id: string) => void;
   updateDeveloper: (id: string, name: string) => void;
-  addUser: (user: Omit<User, 'id'>) => void;
+  addUser: (user: Omit<User, 'id'>) => string;
   removeUser: (userId: string) => void;
   updateUser: (userId: string, data: Partial<User>) => void;
   markNotificationRead: (notificationId: string) => void;
