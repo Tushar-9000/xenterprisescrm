@@ -256,7 +256,7 @@ const SalesManagerDashboard = ({ leads, users }: { leads: any[]; users: any[] })
       <Card className="bg-card border-border">
         <CardHeader><CardTitle className="flex items-center gap-2"><Target className="h-4 w-4 text-primary" /> Telecaller Performance</CardTitle></CardHeader>
         <CardContent>
-          {MOCK_USERS.filter(u => u.role === 'telecaller').map(tc => {
+          {users.filter(u => u.role === 'telecaller').map(tc => {
             const tcLeads = leads.filter(l => l.assignedTo === tc.id);
             const tcConverted = tcLeads.filter(l => l.status === 'Converted').length;
             const tcFollowUp = tcLeads.filter(l => l.status === 'Follow-up').length;
