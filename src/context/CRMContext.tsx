@@ -29,7 +29,7 @@ interface CRMContextType {
   addDeveloper: (name: string) => void;
   removeDeveloper: (id: string) => void;
   updateDeveloper: (id: string, name: string) => void;
-  addUser: (user: Omit<User, 'id'>) => void;
+  addUser: (user: Omit<User, 'id'>) => string;
   removeUser: (userId: string) => void;
   updateUser: (userId: string, data: Partial<User>) => void;
   markNotificationRead: (notificationId: string) => void;
@@ -274,9 +274,11 @@ export const CRMProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setDevelopers(prev => prev.map(d => d.id === id ? { ...d, name } : d));
   }, []);
 
-  const addUser = useCallback((user: Omit<User, 'id'>) => {
-    setUsers(prev => [...prev, { ...user, id: `u-${Date.now()}` }]);
+  const addUser = useCallback((user: Omit<User, 'id'>): string => {
+    const id = `u-${Date.now()}`;
+    setUsers(prev => [...prev, { ...user, id }]);
     addActivity('user_added', 'User Added', `New user "${user.name}" (${user.role}) added`);
+    return id;
     notifyByRole(['admin'], 'New User Added', `"${user.name}" joined as ${user.role}`);
   }, [users]);
 
