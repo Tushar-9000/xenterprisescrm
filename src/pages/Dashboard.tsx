@@ -446,7 +446,7 @@ const StatusBadge = ({ status }: { status: string }) => {
 
 const Dashboard = () => {
   const { user } = useAuth();
-  const { leads, projects, notifications, activities } = useCRM();
+  const { leads, projects, notifications, activities, users } = useCRM();
 
   if (!user) return null;
 
