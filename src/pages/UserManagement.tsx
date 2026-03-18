@@ -41,9 +41,9 @@ const UserManagement = () => {
       role: newUser.role,
       joiningDate: newUser.joiningDate || new Date().toISOString().split('T')[0],
     };
-    addUser(userData);
-    // Also register the password in auth context
-    const addedUser = users[users.length]; // will be set after re-render
+    const newId = addUser(userData);
+    // Register the user in auth context so they can log in
+    registerUser({ ...userData, id: newId }, newUser.password);
     setNewUser({ name: '', email: '', phone: '', password: '', role: 'telecaller', joiningDate: '', username: '' });
     setShowAddPassword(false);
     setAddOpen(false);
