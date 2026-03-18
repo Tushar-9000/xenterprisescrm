@@ -25,7 +25,8 @@ const ROLE_COLORS: Record<UserRole, string> = {
 };
 
 const Login = () => {
-  const { login, allUsers } = useAuth();
+  const { login } = useAuth();
+  const { users: allUsers } = useCRM();
   const { theme, toggleTheme } = useTheme();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
