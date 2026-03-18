@@ -17,7 +17,7 @@ import { toast } from 'sonner';
 const UserManagement = () => {
   const navigate = useNavigate();
   const { users, addUser, removeUser, updateUser } = useCRM();
-  const { updatePassword, passwords } = useAuth();
+  const { updatePassword, passwords, registerUser } = useAuth();
   const [addOpen, setAddOpen] = useState(false);
   const [editUserId, setEditUserId] = useState<string | null>(null);
   const [showAddPassword, setShowAddPassword] = useState(false);
