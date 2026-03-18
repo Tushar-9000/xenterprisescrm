@@ -1,6 +1,6 @@
 import { useAuth } from '@/context/AuthContext';
 import { useCRM } from '@/context/CRMContext';
-import { ROLE_LABELS, MOCK_USERS, Activity } from '@/types/crm';
+import { ROLE_LABELS, Activity } from '@/types/crm';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Phone, FolderKanban, Users, TrendingUp, Clock, CheckCircle, ArrowUpRight, ArrowDownRight, Activity as ActivityIcon, BarChart3, Target, UserCheck, PhoneCall, CalendarCheck, UserPlus, Trash2, FileText, GitBranch } from 'lucide-react';
 
