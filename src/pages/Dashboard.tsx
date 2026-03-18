@@ -227,7 +227,7 @@ const AdminDashboard = ({ leads, projects, notifications, activities, users }: {
   );
 };
 
-const SalesManagerDashboard = ({ leads }: { leads: any[] }) => {
+const SalesManagerDashboard = ({ leads, users }: { leads: any[]; users: any[] }) => {
   const assigned = leads.filter(l => l.assignedTo).length;
   const converted = leads.filter(l => l.status === 'Converted').length;
   const followUps = leads.filter(l => l.status === 'Follow-up').length;
