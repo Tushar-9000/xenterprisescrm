@@ -122,7 +122,7 @@ const AdminDashboard = ({ leads, projects, notifications, activities, users }: {
             <CardTitle className="text-lg flex items-center gap-2"><Users className="h-4 w-4 text-primary" /> Team Overview</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {MOCK_USERS.filter(u => u.role !== 'admin').map(member => {
+            {users.filter(u => u.role !== 'admin').map(member => {
               const memberLeads = leads.filter(l => l.assignedTo === member.id);
               const memberConverted = memberLeads.filter(l => l.status === 'Converted').length;
               return (
