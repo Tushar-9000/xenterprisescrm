@@ -1,6 +1,6 @@
 import { useAuth } from '@/context/AuthContext';
 import { useCRM } from '@/context/CRMContext';
-import { ROLE_LABELS, MOCK_USERS, Activity } from '@/types/crm';
+import { ROLE_LABELS, Activity } from '@/types/crm';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Phone, FolderKanban, Users, TrendingUp, Clock, CheckCircle, ArrowUpRight, ArrowDownRight, Activity as ActivityIcon, BarChart3, Target, UserCheck, PhoneCall, CalendarCheck, UserPlus, Trash2, FileText, GitBranch } from 'lucide-react';
 
@@ -43,7 +43,7 @@ const formatTimeAgo = (dateStr: string) => {
   return `${Math.floor(hrs / 24)}d ago`;
 };
 
-const AdminDashboard = ({ leads, projects, notifications, activities }: { leads: any[]; projects: any[]; notifications: any[]; activities: Activity[] }) => {
+const AdminDashboard = ({ leads, projects, notifications, activities, users }: { leads: any[]; projects: any[]; notifications: any[]; activities: Activity[]; users: any[] }) => {
   const converted = leads.filter(l => l.status === 'Converted').length;
   const conversionRate = leads.length > 0 ? Math.round((converted / leads.length) * 100) : 0;
   const assignedLeads = leads.filter(l => l.assignedTo).length;
@@ -122,7 +122,7 @@ const AdminDashboard = ({ leads, projects, notifications, activities }: { leads:
             <CardTitle className="text-lg flex items-center gap-2"><Users className="h-4 w-4 text-primary" /> Team Overview</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {MOCK_USERS.filter(u => u.role !== 'admin').map(member => {
+            {users.filter(u => u.role !== 'admin').map(member => {
               const memberLeads = leads.filter(l => l.assignedTo === member.id);
               const memberConverted = memberLeads.filter(l => l.status === 'Converted').length;
               return (
@@ -227,7 +227,7 @@ const AdminDashboard = ({ leads, projects, notifications, activities }: { leads:
   );
 };
 
-const SalesManagerDashboard = ({ leads }: { leads: any[] }) => {
+const SalesManagerDashboard = ({ leads, users }: { leads: any[]; users: any[] }) => {
   const assigned = leads.filter(l => l.assignedTo).length;
   const converted = leads.filter(l => l.status === 'Converted').length;
   const followUps = leads.filter(l => l.status === 'Follow-up').length;
@@ -256,7 +256,7 @@ const SalesManagerDashboard = ({ leads }: { leads: any[] }) => {
       <Card className="bg-card border-border">
         <CardHeader><CardTitle className="flex items-center gap-2"><Target className="h-4 w-4 text-primary" /> Telecaller Performance</CardTitle></CardHeader>
         <CardContent>
-          {MOCK_USERS.filter(u => u.role === 'telecaller').map(tc => {
+          {users.filter(u => u.role === 'telecaller').map(tc => {
             const tcLeads = leads.filter(l => l.assignedTo === tc.id);
             const tcConverted = tcLeads.filter(l => l.status === 'Converted').length;
             const tcFollowUp = tcLeads.filter(l => l.status === 'Follow-up').length;
@@ -446,7 +446,7 @@ const StatusBadge = ({ status }: { status: string }) => {
 
 const Dashboard = () => {
   const { user } = useAuth();
-  const { leads, projects, notifications, activities } = useCRM();
+  const { leads, projects, notifications, activities, users } = useCRM();
 
   if (!user) return null;
 
@@ -457,8 +457,8 @@ const Dashboard = () => {
         <p className="text-muted-foreground mt-1">{ROLE_LABELS[user.role]} Dashboard</p>
       </div>
 
-      {user.role === 'admin' && <AdminDashboard leads={leads} projects={projects} notifications={notifications} activities={activities} />}
-      {user.role === 'sales_manager' && <SalesManagerDashboard leads={leads} />}
+      {user.role === 'admin' && <AdminDashboard leads={leads} projects={projects} notifications={notifications} activities={activities} users={users} />}
+      {user.role === 'sales_manager' && <SalesManagerDashboard leads={leads} users={users} />}
       {user.role === 'telecaller' && <TelecallerDashboard leads={leads} userId={user.id} />}
       {user.role === 'tech_lead' && <TechLeadDashboard projects={projects} />}
     </div>

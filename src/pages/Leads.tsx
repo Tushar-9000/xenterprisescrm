@@ -387,8 +387,10 @@ const Leads = () => {
                           </DialogTrigger>
                           <DialogContent className="bg-card border-border">
                             <DialogHeader><DialogTitle>Rename Folder</DialogTitle></DialogHeader>
-                            <Input value={renameFolderName} onChange={e => setRenameFolderName(e.target.value)} />
-                            <Button onClick={() => handleRenameFolder(folder.id)}>Save</Button>
+                            <form onSubmit={(e) => { e.preventDefault(); handleRenameFolder(folder.id); }} className="space-y-2">
+                              <Input value={renameFolderName} onChange={e => setRenameFolderName(e.target.value)} />
+                              <Button type="submit">Save</Button>
+                            </form>
                           </DialogContent>
                         </Dialog>
                         <AlertDialog>
@@ -622,8 +624,10 @@ const LeadTable = ({ leads, user, isManager, isTelecaller, onEdit, onDelete, onC
                               </div>
                             ))}
                           </div>
-                          <Textarea placeholder="Add a note..." value={noteText} onChange={e => setNoteText(e.target.value)} />
-                          <Button onClick={() => handleAddNote(lead.id)}>Add Note</Button>
+                          <form onSubmit={(e) => { e.preventDefault(); handleAddNote(lead.id); }} className="space-y-2">
+                            <Textarea placeholder="Add a note..." value={noteText} onChange={e => setNoteText(e.target.value)} />
+                            <Button type="submit">Add Note</Button>
+                          </form>
                         </DialogContent>
                       </Dialog>
                       {onEdit && <Button size="sm" variant="ghost" onClick={() => onEdit(lead)}><Pencil className="h-3.5 w-3.5" /></Button>}
