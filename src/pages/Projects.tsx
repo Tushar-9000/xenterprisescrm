@@ -226,10 +226,10 @@ const Projects = () => {
                           ))}
                         </div>
                         {isTechLead && (
-                          <>
+                          <form onSubmit={(e) => { e.preventDefault(); handleAddNote(project.id); }} className="space-y-2">
                             <Textarea placeholder="Add technical note..." value={noteText} onChange={e => setNoteText(e.target.value)} />
-                            <Button onClick={() => handleAddNote(project.id)}>Add Note</Button>
-                          </>
+                            <Button type="submit">Add Note</Button>
+                          </form>
                         )}
                       </DialogContent>
                     </Dialog>

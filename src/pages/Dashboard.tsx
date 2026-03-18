@@ -457,7 +457,7 @@ const Dashboard = () => {
         <p className="text-muted-foreground mt-1">{ROLE_LABELS[user.role]} Dashboard</p>
       </div>
 
-      {user.role === 'admin' && <AdminDashboard leads={leads} projects={projects} notifications={notifications} activities={activities} />}
+      {user.role === 'admin' && <AdminDashboard leads={leads} projects={projects} notifications={notifications} activities={activities} users={users} />}
       {user.role === 'sales_manager' && <SalesManagerDashboard leads={leads} />}
       {user.role === 'telecaller' && <TelecallerDashboard leads={leads} userId={user.id} />}
       {user.role === 'tech_lead' && <TechLeadDashboard projects={projects} />}

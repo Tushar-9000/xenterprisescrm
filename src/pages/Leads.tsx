@@ -387,8 +387,10 @@ const Leads = () => {
                           </DialogTrigger>
                           <DialogContent className="bg-card border-border">
                             <DialogHeader><DialogTitle>Rename Folder</DialogTitle></DialogHeader>
-                            <Input value={renameFolderName} onChange={e => setRenameFolderName(e.target.value)} />
-                            <Button onClick={() => handleRenameFolder(folder.id)}>Save</Button>
+                            <form onSubmit={(e) => { e.preventDefault(); handleRenameFolder(folder.id); }} className="space-y-2">
+                              <Input value={renameFolderName} onChange={e => setRenameFolderName(e.target.value)} />
+                              <Button type="submit">Save</Button>
+                            </form>
                           </DialogContent>
                         </Dialog>
                         <AlertDialog>
