@@ -43,7 +43,7 @@ const formatTimeAgo = (dateStr: string) => {
   return `${Math.floor(hrs / 24)}d ago`;
 };
 
-const AdminDashboard = ({ leads, projects, notifications, activities }: { leads: any[]; projects: any[]; notifications: any[]; activities: Activity[] }) => {
+const AdminDashboard = ({ leads, projects, notifications, activities, users }: { leads: any[]; projects: any[]; notifications: any[]; activities: Activity[]; users: any[] }) => {
   const converted = leads.filter(l => l.status === 'Converted').length;
   const conversionRate = leads.length > 0 ? Math.round((converted / leads.length) * 100) : 0;
   const assignedLeads = leads.filter(l => l.assignedTo).length;
