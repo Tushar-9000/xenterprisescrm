@@ -99,22 +99,22 @@ const UserManagement = () => {
             <form onSubmit={(e) => { e.preventDefault(); handleAdd(); }} className="space-y-4">
               <div>
                 <Label className="text-sm font-medium">Full Name <span className="text-destructive">*</span></Label>
-                <Input placeholder="e.g. John Doe" value={newUser.name} onChange={e => setNewUser(p => ({ ...p, name: e.target.value }))} className="mt-1" />
+                <Input placeholder="Full Name" value={newUser.name} onChange={e => setNewUser(p => ({ ...p, name: e.target.value }))} className="mt-1" />
               </div>
               <div>
                 <Label className="text-sm font-medium">Username</Label>
-                <Input placeholder="e.g. johndoe" value={newUser.username} onChange={e => setNewUser(p => ({ ...p, username: e.target.value }))} className="mt-1" />
+                <Input placeholder="Username" value={newUser.username} onChange={e => setNewUser(p => ({ ...p, username: e.target.value }))} className="mt-1" />
               </div>
               <div>
                 <Label className="text-sm font-medium">Email Address <span className="text-destructive">*</span></Label>
-                <Input placeholder="e.g. john@company.com" type="email" value={newUser.email} onChange={e => setNewUser(p => ({ ...p, email: e.target.value }))} className="mt-1" />
+                <Input placeholder="Email Address" type="email" value={newUser.email} onChange={e => setNewUser(p => ({ ...p, email: e.target.value }))} className="mt-1" />
               </div>
               <div>
                 <Label className="text-sm font-medium">Password <span className="text-destructive">*</span></Label>
                 <div className="relative mt-1">
                   <Input
                     type={showAddPassword ? 'text' : 'password'}
-                    placeholder="Min. 6 characters"
+                    placeholder="Password"
                     value={newUser.password}
                     onChange={e => setNewUser(p => ({ ...p, password: e.target.value }))}
                     className="pr-10"
@@ -126,7 +126,7 @@ const UserManagement = () => {
               </div>
               <div>
                 <Label className="text-sm font-medium">Phone Number</Label>
-                <Input placeholder="e.g. +91 9000000000" value={newUser.phone} onChange={e => setNewUser(p => ({ ...p, phone: sanitizePhone(e.target.value) }))} className="mt-1" />
+                <Input placeholder="Phone Number" value={newUser.phone} onChange={e => setNewUser(p => ({ ...p, phone: sanitizePhone(e.target.value) }))} className="mt-1" />
               </div>
               <div>
                 <Label className="text-sm font-medium">Role <span className="text-destructive">*</span></Label>
