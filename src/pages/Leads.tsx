@@ -191,7 +191,7 @@ const Leads = () => {
             return myLeads.some(l => l.folderId === fid && (l.name.toLowerCase().includes(q) || l.email.toLowerCase().includes(q) || l.phone.includes(searchQuery) || (l.company || '').toLowerCase().includes(q)));
           }) : folderIds;
 
-          if (filteredFolderIds.length === 0 && unfoldered.length === 0) {
+          if (filteredFolderIds.length === 0 && (q || (folderIds.length === 0 && unfoldered.length === 0))) {
             return (
               <Card className="bg-card border-border">
                 <CardContent className="py-16 text-center">
@@ -245,8 +245,10 @@ const Leads = () => {
             </div>
           );
         })()}
+      </div>
+    );
+  }
 
-  const currentFolder = folders.find(f => f.id === selectedFolder);
   const folderLeads = selectedFolder ? leads.filter(l => l.folderId === selectedFolder) : [];
 
   const handleCreateFolder = () => {
