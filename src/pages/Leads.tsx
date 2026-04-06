@@ -155,14 +155,18 @@ const Leads = () => {
       return (
         <div className="space-y-6 animate-fade-in">
           <div className="flex items-center gap-3">
-            <Button variant="ghost" size="icon" onClick={() => setTelecallerFolder(null)}><ArrowLeft className="h-4 w-4" /></Button>
+            <Button variant="ghost" size="icon" onClick={() => { setTelecallerFolder(null); setSearchQuery(''); }}><ArrowLeft className="h-4 w-4" /></Button>
             <div>
               <h1 className="text-3xl font-bold">{currentTcFolder?.name}</h1>
               {currentTcFolder?.location && <p className="text-muted-foreground text-sm flex items-center gap-1"><MapPin className="h-3 w-3" />{currentTcFolder.location}</p>}
               <p className="text-muted-foreground text-sm">{tcFolderLeads.length} leads assigned</p>
             </div>
           </div>
-          <LeadTable leads={tcFolderLeads} user={user} isManager={false} isTelecaller={true} onConvert={(lead) => { setConvertLead(lead); setProjectDetails({ projectName: `${lead.name} Project`, description: '' }); }} />
+          <div className="relative max-w-sm">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input placeholder="Search leads..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className="pl-9" />
+          </div>
+          <LeadTable leads={tcFolderLeads.filter(l => !searchQuery || l.name.toLowerCase().includes(searchQuery.toLowerCase()) || l.email.toLowerCase().includes(searchQuery.toLowerCase()) || l.phone.includes(searchQuery) || (l.company || '').toLowerCase().includes(searchQuery.toLowerCase()))} user={user} isManager={false} isTelecaller={true} onConvert={(lead) => { setConvertLead(lead); setProjectDetails({ projectName: `${lead.name} Project`, description: '' }); }} />
           {projectRequestDialog}
         </div>
       );
