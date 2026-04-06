@@ -376,69 +376,86 @@ const Leads = () => {
           )}
         </div>
 
-        {folders.length === 0 ? (
-          <Card className="bg-card border-border">
-            <CardContent className="py-16 text-center">
-              <FolderOpen className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
-              <p className="text-muted-foreground">No folders yet. Create a folder to organize leads by business/niche and location.</p>
-            </CardContent>
-          </Card>
-        ) : (
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {folders.map(folder => {
-              const count = leads.filter(l => l.folderId === folder.id).length;
-              return (
-                <Card key={folder.id} className="bg-card border-border cursor-pointer hover:border-primary/50 transition-colors group" onClick={() => setSelectedFolder(folder.id)}>
-                  <CardContent className="p-5">
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                          <FolderOpen className="h-5 w-5 text-primary" />
+        <div className="relative max-w-sm">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input placeholder="Search folders & leads..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className="pl-9" />
+        </div>
+
+        {(() => {
+          const q = searchQuery.toLowerCase();
+          const filteredFolders = q ? folders.filter(folder => {
+            if (folder.name.toLowerCase().includes(q) || folder.location?.toLowerCase().includes(q)) return true;
+            return leads.some(l => l.folderId === folder.id && (l.name.toLowerCase().includes(q) || l.email.toLowerCase().includes(q) || l.phone.includes(searchQuery) || (l.company || '').toLowerCase().includes(q)));
+          }) : folders;
+
+          if (filteredFolders.length === 0) {
+            return (
+              <Card className="bg-card border-border">
+                <CardContent className="py-16 text-center">
+                  <FolderOpen className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
+                  <p className="text-muted-foreground">{q ? 'No results found.' : 'No folders yet. Create a folder to organize leads by business/niche and location.'}</p>
+                </CardContent>
+              </Card>
+            );
+          }
+
+          return (
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {filteredFolders.map(folder => {
+                const count = leads.filter(l => l.folderId === folder.id).length;
+                return (
+                  <Card key={folder.id} className="bg-card border-border cursor-pointer hover:border-primary/50 transition-colors group" onClick={() => { setSelectedFolder(folder.id); setSearchQuery(''); }}>
+                    <CardContent className="p-5">
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                            <FolderOpen className="h-5 w-5 text-primary" />
+                          </div>
+                          <div>
+                            <p className="font-semibold">{folder.name}</p>
+                            {folder.location && (
+                              <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5"><MapPin className="h-3 w-3" />{folder.location}</p>
+                            )}
+                          </div>
                         </div>
-                        <div>
-                          <p className="font-semibold">{folder.name}</p>
-                          {folder.location && (
-                            <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5"><MapPin className="h-3 w-3" />{folder.location}</p>
-                          )}
+                        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity" onClick={e => e.stopPropagation()}>
+                          <Dialog open={renameFolderOpen === folder.id} onOpenChange={(o) => { setRenameFolderOpen(o ? folder.id : null); if (o) setRenameFolderName(folder.name); }}>
+                            <DialogTrigger asChild>
+                              <Button size="icon" variant="ghost" className="h-7 w-7"><Pencil className="h-3 w-3" /></Button>
+                            </DialogTrigger>
+                            <DialogContent className="bg-card border-border">
+                              <DialogHeader><DialogTitle>Rename Folder</DialogTitle></DialogHeader>
+                              <form onSubmit={(e) => { e.preventDefault(); handleRenameFolder(folder.id); }} className="space-y-2">
+                                <Input value={renameFolderName} onChange={e => setRenameFolderName(e.target.value)} />
+                                <Button type="submit">Save</Button>
+                              </form>
+                            </DialogContent>
+                          </Dialog>
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button size="icon" variant="ghost" className="h-7 w-7 text-destructive"><Trash2 className="h-3 w-3" /></Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent className="bg-card border-border">
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Delete Folder</AlertDialogTitle>
+                                <AlertDialogDescription>Delete "{folder.name}" and all {count} leads inside it?</AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction onClick={() => { deleteFolder(folder.id); toast.success('Folder deleted'); }}>Delete</AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
                         </div>
                       </div>
-                      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity" onClick={e => e.stopPropagation()}>
-                        <Dialog open={renameFolderOpen === folder.id} onOpenChange={(o) => { setRenameFolderOpen(o ? folder.id : null); if (o) setRenameFolderName(folder.name); }}>
-                          <DialogTrigger asChild>
-                            <Button size="icon" variant="ghost" className="h-7 w-7"><Pencil className="h-3 w-3" /></Button>
-                          </DialogTrigger>
-                          <DialogContent className="bg-card border-border">
-                            <DialogHeader><DialogTitle>Rename Folder</DialogTitle></DialogHeader>
-                            <form onSubmit={(e) => { e.preventDefault(); handleRenameFolder(folder.id); }} className="space-y-2">
-                              <Input value={renameFolderName} onChange={e => setRenameFolderName(e.target.value)} />
-                              <Button type="submit">Save</Button>
-                            </form>
-                          </DialogContent>
-                        </Dialog>
-                        <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <Button size="icon" variant="ghost" className="h-7 w-7 text-destructive"><Trash2 className="h-3 w-3" /></Button>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent className="bg-card border-border">
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>Delete Folder</AlertDialogTitle>
-                              <AlertDialogDescription>Delete "{folder.name}" and all {count} leads inside it?</AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel>Cancel</AlertDialogCancel>
-                              <AlertDialogAction onClick={() => { deleteFolder(folder.id); toast.success('Folder deleted'); }}>Delete</AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
-                      </div>
-                    </div>
-                    <p className="text-sm text-muted-foreground mt-3">{count} lead{count !== 1 ? 's' : ''}</p>
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </div>
-        )}
+                      <p className="text-sm text-muted-foreground mt-3">{count} lead{count !== 1 ? 's' : ''}</p>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+          );
+        })()}
       </div>
     );
   }
