@@ -178,8 +178,19 @@ const Leads = () => {
           <h1 className="text-3xl font-bold">My Leads</h1>
           <p className="text-muted-foreground mt-1">{myLeads.length} leads assigned across {folderIds.length} folder{folderIds.length !== 1 ? 's' : ''}</p>
         </div>
+        <div className="relative max-w-sm">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input placeholder="Search folders & leads..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className="pl-9" />
+        </div>
 
-        {folderIds.length === 0 && unfoldered.length === 0 ? (
+        {(() => {
+          const q = searchQuery.toLowerCase();
+          const filteredFolderIds = q ? folderIds.filter(fid => {
+            const folder = folders.find(f => f.id === fid);
+            if (folder?.name.toLowerCase().includes(q) || folder?.location?.toLowerCase().includes(q)) return true;
+            return myLeads.some(l => l.folderId === fid && (l.name.toLowerCase().includes(q) || l.email.toLowerCase().includes(q) || l.phone.includes(searchQuery) || (l.company || '').toLowerCase().includes(q)));
+          }) : folderIds;
+          return filteredFolderIds.length === 0 && (q || (folderIds.length === 0 && unfoldered.length === 0)) ? (
           <Card className="bg-card border-border">
             <CardContent className="py-16 text-center">
               <FolderOpen className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
