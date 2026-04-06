@@ -1,9 +1,11 @@
+import { useState } from 'react';
 import { useCRM } from '@/context/CRMContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { LeadStatus as LeadStatusType } from '@/types/crm';
-import { Users, Phone, Building2, ArrowLeft } from 'lucide-react';
+import { Users, Phone, Building2, ArrowLeft, Search } from 'lucide-react';
 
 const STATUS_COLORS: Record<LeadStatusType, string> = {
   'New': 'bg-blue-500/10 text-blue-500 border-blue-500/20',
@@ -18,8 +20,20 @@ const STATUSES: LeadStatusType[] = ['New', 'Contacted', 'Follow-up', 'Interested
 
 const LeadStatus = () => {
   const { leads, users } = useCRM();
+  const [searchQuery, setSearchQuery] = useState('');
 
   const statusCounts = STATUSES.map(s => ({ status: s, count: leads.filter(l => l.status === s).length }));
+
+  const q = searchQuery.toLowerCase();
+  const filteredLeads = q
+    ? leads.filter(l =>
+        l.name.toLowerCase().includes(q) ||
+        l.phone.includes(searchQuery) ||
+        (l.company || '').toLowerCase().includes(q) ||
+        l.status.toLowerCase().includes(q) ||
+        (users.find(u => u.id === l.assignedTo)?.name || '').toLowerCase().includes(q)
+      )
+    : leads;
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -36,7 +50,7 @@ const LeadStatus = () => {
       {/* Status summary cards */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
         {statusCounts.map(({ status, count }) => (
-          <Card key={status} className="bg-card border-border">
+          <Card key={status} className="bg-card border-border cursor-pointer hover:border-primary/50 transition-colors" onClick={() => setSearchQuery(status)}>
             <CardContent className="p-4 text-center">
               <Badge variant="outline" className={STATUS_COLORS[status]}>{status}</Badge>
               <p className="text-2xl font-bold mt-2">{count}</p>
@@ -45,10 +59,16 @@ const LeadStatus = () => {
         ))}
       </div>
 
+      {/* Search bar */}
+      <div className="relative max-w-sm">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Input placeholder="Search leads by name, phone, company, status..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className="pl-9" />
+      </div>
+
       {/* Leads table */}
       <Card className="bg-card border-border">
         <CardHeader>
-          <CardTitle className="text-lg">All Leads</CardTitle>
+          <CardTitle className="text-lg">All Leads {q && `(${filteredLeads.length} results)`}</CardTitle>
         </CardHeader>
         <CardContent className="p-0">
           <div className="overflow-x-auto">
@@ -58,15 +78,14 @@ const LeadStatus = () => {
                   <th className="text-left py-3 px-4 text-muted-foreground font-medium">Name</th>
                   <th className="text-left py-3 px-4 text-muted-foreground font-medium">Phone</th>
                   <th className="text-left py-3 px-4 text-muted-foreground font-medium">Company</th>
-                  <th className="text-left py-3 px-4 text-muted-foreground font-medium">Source</th>
                   <th className="text-left py-3 px-4 text-muted-foreground font-medium">Assigned To</th>
                   <th className="text-left py-3 px-4 text-muted-foreground font-medium">Status</th>
                 </tr>
               </thead>
               <tbody>
-                {leads.length === 0 ? (
-                  <tr><td colSpan={6} className="text-center py-8 text-muted-foreground">No leads found</td></tr>
-                ) : leads.map(lead => {
+                {filteredLeads.length === 0 ? (
+                  <tr><td colSpan={5} className="text-center py-8 text-muted-foreground">{q ? 'No matching leads found' : 'No leads found'}</td></tr>
+                ) : filteredLeads.map(lead => {
                   const assignee = users.find(u => u.id === lead.assignedTo);
                   return (
                     <tr key={lead.id} className="border-b border-border/50 hover:bg-secondary/30 transition-colors">
@@ -80,7 +99,6 @@ const LeadStatus = () => {
                       <td className="py-3 px-4">
                         {lead.company ? <span className="flex items-center gap-1"><Building2 className="h-3 w-3 text-muted-foreground" />{lead.company}</span> : <span className="text-muted-foreground">—</span>}
                       </td>
-                      <td className="py-3 px-4 text-muted-foreground">{lead.source || '—'}</td>
                       <td className="py-3 px-4 text-muted-foreground">{assignee?.name || 'Unassigned'}</td>
                       <td className="py-3 px-4">
                         <Badge variant="outline" className={STATUS_COLORS[lead.status]}>{lead.status}</Badge>

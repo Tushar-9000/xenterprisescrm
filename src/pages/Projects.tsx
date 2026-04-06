@@ -14,7 +14,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Calendar } from '@/components/ui/calendar';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
-import { Plus, Trash2, UserPlus, Pencil, CalendarIcon, ArrowLeft } from 'lucide-react';
+import { Plus, Trash2, UserPlus, Pencil, CalendarIcon, ArrowLeft, Search } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const PROJECT_STATUSES: ProjectStatus[] = ['Planning', 'In Progress', 'Review', 'Completed', 'On Hold'];
@@ -28,10 +28,22 @@ const Projects = () => {
   const [newProject, setNewProject] = useState({ name: '', clientName: '', clientEmail: '', clientPhone: '' });
   const [renameOpen, setRenameOpen] = useState<string | null>(null);
   const [renameText, setRenameText] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
 
   if (!user) return null;
 
   const isTechLead = user.role === 'tech_lead';
+
+  const q = searchQuery.toLowerCase();
+  const filteredProjects = q
+    ? projects.filter(p =>
+        p.name.toLowerCase().includes(q) ||
+        p.clientName.toLowerCase().includes(q) ||
+        p.clientEmail.toLowerCase().includes(q) ||
+        p.status.toLowerCase().includes(q) ||
+        (developers.find(d => d.id === p.assignedDeveloper)?.name || '').toLowerCase().includes(q)
+      )
+    : projects;
 
   const handleAddNote = (projectId: string) => {
     if (!noteText.trim()) return;
@@ -117,15 +129,20 @@ const Projects = () => {
         )}
       </div>
 
-      {projects.length === 0 ? (
+      <div className="relative max-w-sm">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Input placeholder="Search projects..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className="pl-9" />
+      </div>
+
+      {filteredProjects.length === 0 ? (
         <Card className="bg-card border-border">
           <CardContent className="py-12 text-center text-muted-foreground">
-            No projects yet. {isTechLead ? 'Click "Add Project" to create one, or projects are auto-created when leads are converted.' : 'Projects are automatically created when leads are converted.'}
+            {q ? 'No matching projects found.' : (isTechLead ? 'No projects yet. Click "Add Project" to create one, or projects are auto-created when leads are converted.' : 'Projects are automatically created when leads are converted.')}
           </CardContent>
         </Card>
       ) : (
         <div className="grid gap-4">
-          {projects.map((project) => {
+          {filteredProjects.map((project) => {
             const assignedDev = developers.find(d => d.id === project.assignedDeveloper);
             return (
               <Card key={project.id} className="bg-card border-border">
@@ -179,7 +196,6 @@ const Projects = () => {
                   <div className="flex flex-wrap gap-2 items-center">
                     {isTechLead && (
                       <>
-                        {/* Assign Developer */}
                         <Select value={project.assignedDeveloper || ''} onValueChange={(v) => handleAssignDeveloper(project.id, v)}>
                           <SelectTrigger className="w-44 bg-secondary border-border">
                             <SelectValue placeholder="Assign Developer" />
@@ -189,7 +205,6 @@ const Projects = () => {
                           </SelectContent>
                         </Select>
 
-                        {/* Deadline Picker */}
                         <Popover>
                           <PopoverTrigger asChild>
                             <Button variant="outline" size="sm" className={cn('gap-1', !project.deadline && 'text-muted-foreground')}>
@@ -210,7 +225,6 @@ const Projects = () => {
                       </>
                     )}
 
-                    {/* Notes */}
                     <Dialog open={noteOpen === project.id} onOpenChange={(o) => { setNoteOpen(o ? project.id : null); setNoteText(''); }}>
                       <DialogTrigger asChild>
                         <Button size="sm" variant="secondary">Notes ({project.notes.length})</Button>
@@ -236,7 +250,6 @@ const Projects = () => {
 
                     <span className="text-xs text-muted-foreground">Created: {project.createdAt}</span>
 
-                    {/* Delete */}
                     {isTechLead && (
                       <AlertDialog>
                         <AlertDialogTrigger asChild>
