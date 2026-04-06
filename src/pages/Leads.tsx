@@ -465,7 +465,7 @@ const Leads = () => {
     <div className="space-y-6 animate-fade-in">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <Button variant="ghost" size="icon" onClick={() => setSelectedFolder(null)}><ArrowLeft className="h-4 w-4" /></Button>
+          <Button variant="ghost" size="icon" onClick={() => { setSelectedFolder(null); setSearchQuery(''); }}><ArrowLeft className="h-4 w-4" /></Button>
           <div>
             <h1 className="text-3xl font-bold">{currentFolder?.name}</h1>
             {currentFolder?.location && <p className="text-muted-foreground text-sm flex items-center gap-1"><MapPin className="h-3 w-3" />{currentFolder.location}</p>}
