@@ -249,6 +249,7 @@ const Leads = () => {
     );
   }
 
+  const currentFolder = folders.find(f => f.id === selectedFolder);
   const folderLeads = selectedFolder ? leads.filter(l => l.folderId === selectedFolder) : [];
 
   const handleCreateFolder = () => {
