@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Textarea } from '@/components/ui/textarea';
-import { Plus, FolderPlus, Trash2, Pencil, ArrowLeft, Upload, Download, FolderOpen, MapPin } from 'lucide-react';
+import { Plus, FolderPlus, Trash2, Pencil, ArrowLeft, Upload, Download, FolderOpen, MapPin, Search } from 'lucide-react';
 import { toast } from 'sonner';
 
 const InstagramIcon = ({ className }: { className?: string }) => (
@@ -100,6 +100,7 @@ const Leads = () => {
   const [newLead, setNewLead] = useState({ name: '', email: '', phone: '', company: '', socialMedia: {} as LeadSocialMedia });
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [telecallerFolder, setTelecallerFolder] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
   // Project request dialog state
   const [convertLead, setConvertLead] = useState<Lead | null>(null);
@@ -154,14 +155,18 @@ const Leads = () => {
       return (
         <div className="space-y-6 animate-fade-in">
           <div className="flex items-center gap-3">
-            <Button variant="ghost" size="icon" onClick={() => setTelecallerFolder(null)}><ArrowLeft className="h-4 w-4" /></Button>
+            <Button variant="ghost" size="icon" onClick={() => { setTelecallerFolder(null); setSearchQuery(''); }}><ArrowLeft className="h-4 w-4" /></Button>
             <div>
               <h1 className="text-3xl font-bold">{currentTcFolder?.name}</h1>
               {currentTcFolder?.location && <p className="text-muted-foreground text-sm flex items-center gap-1"><MapPin className="h-3 w-3" />{currentTcFolder.location}</p>}
               <p className="text-muted-foreground text-sm">{tcFolderLeads.length} leads assigned</p>
             </div>
           </div>
-          <LeadTable leads={tcFolderLeads} user={user} isManager={false} isTelecaller={true} onConvert={(lead) => { setConvertLead(lead); setProjectDetails({ projectName: `${lead.name} Project`, description: '' }); }} />
+          <div className="relative max-w-sm">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input placeholder="Search leads..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className="pl-9" />
+          </div>
+          <LeadTable leads={tcFolderLeads.filter(l => !searchQuery || l.name.toLowerCase().includes(searchQuery.toLowerCase()) || l.email.toLowerCase().includes(searchQuery.toLowerCase()) || l.phone.includes(searchQuery) || (l.company || '').toLowerCase().includes(searchQuery.toLowerCase()))} user={user} isManager={false} isTelecaller={true} onConvert={(lead) => { setConvertLead(lead); setProjectDetails({ projectName: `${lead.name} Project`, description: '' }); }} />
           {projectRequestDialog}
         </div>
       );
@@ -173,56 +178,73 @@ const Leads = () => {
           <h1 className="text-3xl font-bold">My Leads</h1>
           <p className="text-muted-foreground mt-1">{myLeads.length} leads assigned across {folderIds.length} folder{folderIds.length !== 1 ? 's' : ''}</p>
         </div>
+        <div className="relative max-w-sm">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input placeholder="Search folders & leads..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className="pl-9" />
+        </div>
 
-        {folderIds.length === 0 && unfoldered.length === 0 ? (
-          <Card className="bg-card border-border">
-            <CardContent className="py-16 text-center">
-              <FolderOpen className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
-              <p className="text-muted-foreground">No leads assigned to you yet.</p>
-            </CardContent>
-          </Card>
-        ) : (
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {folderIds.map(fid => {
-              const folder = folders.find(f => f.id === fid);
-              if (!folder) return null;
-              const count = myLeads.filter(l => l.folderId === fid).length;
-              return (
-                <Card key={fid} className="bg-card border-border cursor-pointer hover:border-primary/50 transition-colors group" onClick={() => setTelecallerFolder(fid)}>
-                  <CardContent className="p-5">
-                    <div className="flex items-center gap-3">
-                      <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                        <FolderOpen className="h-5 w-5 text-primary" />
-                      </div>
-                      <div>
-                        <p className="font-semibold">{folder.name}</p>
-                        {folder.location && (
-                          <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5"><MapPin className="h-3 w-3" />{folder.location}</p>
-                        )}
-                      </div>
-                    </div>
-                    <p className="text-sm text-muted-foreground mt-3">{count} lead{count !== 1 ? 's' : ''} assigned</p>
-                  </CardContent>
-                </Card>
-              );
-            })}
-            {unfoldered.length > 0 && (
+        {(() => {
+          const q = searchQuery.toLowerCase();
+          const filteredFolderIds = q ? folderIds.filter(fid => {
+            const folder = folders.find(f => f.id === fid);
+            if (folder?.name.toLowerCase().includes(q) || folder?.location?.toLowerCase().includes(q)) return true;
+            return myLeads.some(l => l.folderId === fid && (l.name.toLowerCase().includes(q) || l.email.toLowerCase().includes(q) || l.phone.includes(searchQuery) || (l.company || '').toLowerCase().includes(q)));
+          }) : folderIds;
+
+          if (filteredFolderIds.length === 0 && (q || (folderIds.length === 0 && unfoldered.length === 0))) {
+            return (
               <Card className="bg-card border-border">
-                <CardContent className="p-5">
-                  <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 rounded-lg bg-muted flex items-center justify-center">
-                      <FolderOpen className="h-5 w-5 text-muted-foreground" />
-                    </div>
-                    <div>
-                      <p className="font-semibold">Uncategorized</p>
-                      <p className="text-xs text-muted-foreground">{unfoldered.length} lead{unfoldered.length !== 1 ? 's' : ''}</p>
-                    </div>
-                  </div>
+                <CardContent className="py-16 text-center">
+                  <FolderOpen className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
+                  <p className="text-muted-foreground">{q ? 'No results found.' : 'No leads assigned to you yet.'}</p>
                 </CardContent>
               </Card>
-            )}
-          </div>
-        )}
+            );
+          }
+
+          return (
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {filteredFolderIds.map(fid => {
+                const folder = folders.find(f => f.id === fid);
+                if (!folder) return null;
+                const count = myLeads.filter(l => l.folderId === fid).length;
+                return (
+                  <Card key={fid} className="bg-card border-border cursor-pointer hover:border-primary/50 transition-colors group" onClick={() => { setTelecallerFolder(fid); setSearchQuery(''); }}>
+                    <CardContent className="p-5">
+                      <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                          <FolderOpen className="h-5 w-5 text-primary" />
+                        </div>
+                        <div>
+                          <p className="font-semibold">{folder.name}</p>
+                          {folder.location && (
+                            <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5"><MapPin className="h-3 w-3" />{folder.location}</p>
+                          )}
+                        </div>
+                      </div>
+                      <p className="text-sm text-muted-foreground mt-3">{count} lead{count !== 1 ? 's' : ''} assigned</p>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+              {unfoldered.length > 0 && !q && (
+                <Card className="bg-card border-border">
+                  <CardContent className="p-5">
+                    <div className="flex items-center gap-3">
+                      <div className="h-10 w-10 rounded-lg bg-muted flex items-center justify-center">
+                        <FolderOpen className="h-5 w-5 text-muted-foreground" />
+                      </div>
+                      <div>
+                        <p className="font-semibold">Uncategorized</p>
+                        <p className="text-xs text-muted-foreground">{unfoldered.length} lead{unfoldered.length !== 1 ? 's' : ''}</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+          );
+        })()}
       </div>
     );
   }
@@ -354,69 +376,86 @@ const Leads = () => {
           )}
         </div>
 
-        {folders.length === 0 ? (
-          <Card className="bg-card border-border">
-            <CardContent className="py-16 text-center">
-              <FolderOpen className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
-              <p className="text-muted-foreground">No folders yet. Create a folder to organize leads by business/niche and location.</p>
-            </CardContent>
-          </Card>
-        ) : (
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {folders.map(folder => {
-              const count = leads.filter(l => l.folderId === folder.id).length;
-              return (
-                <Card key={folder.id} className="bg-card border-border cursor-pointer hover:border-primary/50 transition-colors group" onClick={() => setSelectedFolder(folder.id)}>
-                  <CardContent className="p-5">
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                          <FolderOpen className="h-5 w-5 text-primary" />
+        <div className="relative max-w-sm">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input placeholder="Search folders & leads..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className="pl-9" />
+        </div>
+
+        {(() => {
+          const q = searchQuery.toLowerCase();
+          const filteredFolders = q ? folders.filter(folder => {
+            if (folder.name.toLowerCase().includes(q) || folder.location?.toLowerCase().includes(q)) return true;
+            return leads.some(l => l.folderId === folder.id && (l.name.toLowerCase().includes(q) || l.email.toLowerCase().includes(q) || l.phone.includes(searchQuery) || (l.company || '').toLowerCase().includes(q)));
+          }) : folders;
+
+          if (filteredFolders.length === 0) {
+            return (
+              <Card className="bg-card border-border">
+                <CardContent className="py-16 text-center">
+                  <FolderOpen className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
+                  <p className="text-muted-foreground">{q ? 'No results found.' : 'No folders yet. Create a folder to organize leads by business/niche and location.'}</p>
+                </CardContent>
+              </Card>
+            );
+          }
+
+          return (
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {filteredFolders.map(folder => {
+                const count = leads.filter(l => l.folderId === folder.id).length;
+                return (
+                  <Card key={folder.id} className="bg-card border-border cursor-pointer hover:border-primary/50 transition-colors group" onClick={() => { setSelectedFolder(folder.id); setSearchQuery(''); }}>
+                    <CardContent className="p-5">
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                            <FolderOpen className="h-5 w-5 text-primary" />
+                          </div>
+                          <div>
+                            <p className="font-semibold">{folder.name}</p>
+                            {folder.location && (
+                              <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5"><MapPin className="h-3 w-3" />{folder.location}</p>
+                            )}
+                          </div>
                         </div>
-                        <div>
-                          <p className="font-semibold">{folder.name}</p>
-                          {folder.location && (
-                            <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5"><MapPin className="h-3 w-3" />{folder.location}</p>
-                          )}
+                        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity" onClick={e => e.stopPropagation()}>
+                          <Dialog open={renameFolderOpen === folder.id} onOpenChange={(o) => { setRenameFolderOpen(o ? folder.id : null); if (o) setRenameFolderName(folder.name); }}>
+                            <DialogTrigger asChild>
+                              <Button size="icon" variant="ghost" className="h-7 w-7"><Pencil className="h-3 w-3" /></Button>
+                            </DialogTrigger>
+                            <DialogContent className="bg-card border-border">
+                              <DialogHeader><DialogTitle>Rename Folder</DialogTitle></DialogHeader>
+                              <form onSubmit={(e) => { e.preventDefault(); handleRenameFolder(folder.id); }} className="space-y-2">
+                                <Input value={renameFolderName} onChange={e => setRenameFolderName(e.target.value)} />
+                                <Button type="submit">Save</Button>
+                              </form>
+                            </DialogContent>
+                          </Dialog>
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button size="icon" variant="ghost" className="h-7 w-7 text-destructive"><Trash2 className="h-3 w-3" /></Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent className="bg-card border-border">
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Delete Folder</AlertDialogTitle>
+                                <AlertDialogDescription>Delete "{folder.name}" and all {count} leads inside it?</AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction onClick={() => { deleteFolder(folder.id); toast.success('Folder deleted'); }}>Delete</AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
                         </div>
                       </div>
-                      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity" onClick={e => e.stopPropagation()}>
-                        <Dialog open={renameFolderOpen === folder.id} onOpenChange={(o) => { setRenameFolderOpen(o ? folder.id : null); if (o) setRenameFolderName(folder.name); }}>
-                          <DialogTrigger asChild>
-                            <Button size="icon" variant="ghost" className="h-7 w-7"><Pencil className="h-3 w-3" /></Button>
-                          </DialogTrigger>
-                          <DialogContent className="bg-card border-border">
-                            <DialogHeader><DialogTitle>Rename Folder</DialogTitle></DialogHeader>
-                            <form onSubmit={(e) => { e.preventDefault(); handleRenameFolder(folder.id); }} className="space-y-2">
-                              <Input value={renameFolderName} onChange={e => setRenameFolderName(e.target.value)} />
-                              <Button type="submit">Save</Button>
-                            </form>
-                          </DialogContent>
-                        </Dialog>
-                        <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <Button size="icon" variant="ghost" className="h-7 w-7 text-destructive"><Trash2 className="h-3 w-3" /></Button>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent className="bg-card border-border">
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>Delete Folder</AlertDialogTitle>
-                              <AlertDialogDescription>Delete "{folder.name}" and all {count} leads inside it?</AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel>Cancel</AlertDialogCancel>
-                              <AlertDialogAction onClick={() => { deleteFolder(folder.id); toast.success('Folder deleted'); }}>Delete</AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
-                      </div>
-                    </div>
-                    <p className="text-sm text-muted-foreground mt-3">{count} lead{count !== 1 ? 's' : ''}</p>
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </div>
-        )}
+                      <p className="text-sm text-muted-foreground mt-3">{count} lead{count !== 1 ? 's' : ''}</p>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+          );
+        })()}
       </div>
     );
   }
@@ -426,7 +465,7 @@ const Leads = () => {
     <div className="space-y-6 animate-fade-in">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <Button variant="ghost" size="icon" onClick={() => setSelectedFolder(null)}><ArrowLeft className="h-4 w-4" /></Button>
+          <Button variant="ghost" size="icon" onClick={() => { setSelectedFolder(null); setSearchQuery(''); }}><ArrowLeft className="h-4 w-4" /></Button>
           <div>
             <h1 className="text-3xl font-bold">{currentFolder?.name}</h1>
             {currentFolder?.location && <p className="text-muted-foreground text-sm flex items-center gap-1"><MapPin className="h-3 w-3" />{currentFolder.location}</p>}
@@ -459,8 +498,13 @@ const Leads = () => {
         </div>
       </div>
 
+      <div className="relative max-w-sm">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Input placeholder="Search leads..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className="pl-9" />
+      </div>
+
       <LeadTable
-        leads={folderLeads}
+        leads={folderLeads.filter(l => { const q = searchQuery.toLowerCase(); return !q || l.name.toLowerCase().includes(q) || l.email.toLowerCase().includes(q) || l.phone.includes(searchQuery) || (l.company || '').toLowerCase().includes(q); })}
         user={user}
         isManager={isManager}
         isTelecaller={false}
