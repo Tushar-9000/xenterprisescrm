@@ -498,8 +498,13 @@ const Leads = () => {
         </div>
       </div>
 
+      <div className="relative max-w-sm">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Input placeholder="Search leads..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className="pl-9" />
+      </div>
+
       <LeadTable
-        leads={folderLeads}
+        leads={folderLeads.filter(l => { const q = searchQuery.toLowerCase(); return !q || l.name.toLowerCase().includes(q) || l.email.toLowerCase().includes(q) || l.phone.includes(searchQuery) || (l.company || '').toLowerCase().includes(q); })}
         user={user}
         isManager={isManager}
         isTelecaller={false}
