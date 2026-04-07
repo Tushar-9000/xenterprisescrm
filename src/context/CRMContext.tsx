@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import { Lead, Project, Notification, Note, LeadStatus, ProjectStatus, Developer, LeadFolder, User, Activity, ProjectRequest } from '@/types/crm';
-import { supabase } from '@/integrations/supabase/client';
+import { db as supabase } from '@/integrations/supabase/db';
 
 interface CRMContextType {
   leads: Lead[];
