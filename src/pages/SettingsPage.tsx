@@ -15,36 +15,36 @@ const SettingsPage = () => {
   const { user } = useAuth();
   const { theme, toggleTheme } = useTheme();
 
-  const [profileData, setProfileData] = useState({
-    name: user?.name || '',
-    email: user?.email || '',
-    phone: user?.phone || '',
+  const [profileData, setProfileData] = useState(() => {
+    const saved = localStorage.getItem('crm-settings-profile');
+    if (saved) return JSON.parse(saved);
+    return { name: user?.name || '', email: user?.email || '', phone: user?.phone || '' };
   });
 
-  const [notifications, setNotifications] = useState({
-    emailNotifications: true,
-    pushNotifications: true,
-    soundEnabled: true,
-    leadUpdates: true,
-    projectUpdates: true,
-    systemAlerts: true,
+  const [notifications, setNotifications] = useState(() => {
+    const saved = localStorage.getItem('crm-settings-notifications');
+    if (saved) return JSON.parse(saved);
+    return { emailNotifications: true, pushNotifications: true, soundEnabled: true, leadUpdates: true, projectUpdates: true, systemAlerts: true };
   });
 
-  const [general, setGeneral] = useState({
-    language: 'en',
-    timezone: 'Asia/Kolkata',
-    dateFormat: 'dd/MM/yyyy',
+  const [general, setGeneral] = useState(() => {
+    const saved = localStorage.getItem('crm-settings-general');
+    if (saved) return JSON.parse(saved);
+    return { language: 'en', timezone: 'Asia/Kolkata', dateFormat: 'dd/MM/yyyy' };
   });
 
   const handleSaveProfile = () => {
+    localStorage.setItem('crm-settings-profile', JSON.stringify(profileData));
     toast.success('Profile settings saved');
   };
 
   const handleSaveNotifications = () => {
+    localStorage.setItem('crm-settings-notifications', JSON.stringify(notifications));
     toast.success('Notification preferences saved');
   };
 
   const handleSaveGeneral = () => {
+    localStorage.setItem('crm-settings-general', JSON.stringify(general));
     toast.success('General settings saved');
   };
 
