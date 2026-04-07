@@ -1,9 +1,10 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
-import { User, MOCK_USERS } from '@/types/crm';
+import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import { User } from '@/types/crm';
+import { supabase } from '@/integrations/supabase/client';
 
 interface AuthContextType {
   user: User | null;
-  login: (email: string, password: string) => boolean;
+  login: (email: string, password: string) => Promise<boolean>;
   loginAs: (user: User) => void;
   logout: () => void;
   isAuthenticated: boolean;
@@ -20,35 +21,72 @@ export const useAuth = () => {
   return ctx;
 };
 
+const mapDbUser = (row: any): User => ({
+  id: row.id,
+  name: row.name,
+  username: row.username || undefined,
+  email: row.email,
+  phone: row.phone || undefined,
+  dob: row.dob || undefined,
+  address: row.address || undefined,
+  profilePic: row.profile_pic || undefined,
+  password: row.password || undefined,
+  role: row.role,
+  avatar: row.avatar || undefined,
+  joiningDate: row.joining_date || undefined,
+});
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [authUsers, setAuthUsers] = useState<User[]>([...MOCK_USERS]);
-  const [passwords, setPasswords] = useState<Record<string, string>>(() => {
-    const map: Record<string, string> = {};
-    MOCK_USERS.forEach(u => { map[u.id] = u.password || `${u.name}123`; });
-    return map;
-  });
+  const [passwords, setPasswords] = useState<Record<string, string>>({});
 
-  const login = useCallback((email: string, password: string) => {
-    const found = authUsers.find(u => u.email.toLowerCase() === email.toLowerCase());
-    if (found && passwords[found.id] === password) {
-      setUser(found);
+  useEffect(() => {
+    const loadPasswords = async () => {
+      const { data } = await supabase.from('users').select('id, password');
+      if (data) {
+        const map: Record<string, string> = {};
+        data.forEach((u: any) => { map[u.id] = u.password || ''; });
+        setPasswords(map);
+      }
+    };
+    loadPasswords();
+  }, []);
+
+  const login = useCallback(async (email: string, password: string) => {
+    const { data } = await supabase
+      .from('users')
+      .select('*')
+      .ilike('email', email)
+      .single();
+    if (data && data.password === password) {
+      setUser(mapDbUser(data));
       return true;
     }
     return false;
-  }, [authUsers, passwords]);
+  }, []);
 
   const loginAs = useCallback((u: User) => setUser(u), []);
   const logout = useCallback(() => setUser(null), []);
 
-  const updatePassword = useCallback((userId: string, newPassword: string) => {
+  const updatePassword = useCallback(async (userId: string, newPassword: string) => {
+    await supabase.from('users').update({ password: newPassword }).eq('id', userId);
     setPasswords(prev => ({ ...prev, [userId]: newPassword }));
   }, []);
 
-  const registerUser = useCallback((newUser: User, password: string) => {
-    setAuthUsers(prev => {
-      if (prev.find(u => u.id === newUser.id)) return prev;
-      return [...prev, newUser];
+  const registerUser = useCallback(async (newUser: User, password: string) => {
+    await supabase.from('users').upsert({
+      id: newUser.id,
+      name: newUser.name,
+      username: newUser.username || null,
+      email: newUser.email,
+      phone: newUser.phone || null,
+      dob: newUser.dob || null,
+      address: newUser.address || null,
+      profile_pic: newUser.profilePic || null,
+      password: password,
+      role: newUser.role,
+      avatar: newUser.avatar || null,
+      joining_date: newUser.joiningDate || null,
     });
     setPasswords(prev => ({ ...prev, [newUser.id]: password }));
   }, []);
