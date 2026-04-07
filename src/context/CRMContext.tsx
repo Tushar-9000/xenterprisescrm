@@ -214,11 +214,11 @@ export const CRMProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const addLead = useCallback(async (lead: Omit<Lead, 'id' | 'notes' | 'createdAt' | 'updatedAt'>) => {
     const { data } = await supabase.from('leads').insert({
       name: lead.name, email: lead.email, phone: lead.phone,
-      company: lead.company || null, status: lead.status,
+      company: lead.company || null, status: lead.status as any,
       assigned_to: lead.assignedTo || null, source: lead.source || null,
-      social_media: lead.socialMedia || {}, follow_up_date: lead.followUpDate || null,
+      social_media: (lead.socialMedia || {}) as any, follow_up_date: lead.followUpDate || null,
       folder_id: lead.folderId || null,
-    }).select().single();
+    } as any).select().single();
     if (data) {
       setLeads(prev => [...prev, mapDbLead(data, [])]);
       addActivityDb('lead_added', 'Lead Added', `New lead "${lead.name}" from ${lead.source || 'unknown source'}`);
