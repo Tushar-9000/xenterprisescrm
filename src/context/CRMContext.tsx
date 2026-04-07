@@ -227,7 +227,13 @@ export const CRMProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   }, [users]);
 
   const updateLead = useCallback(async (leadId: string, data: Partial<Pick<Lead, 'name' | 'email' | 'phone' | 'company' | 'source'>>) => {
-    await supabase.from('leads').update(data).eq('id', leadId);
+    const dbData: any = {};
+    if (data.name !== undefined) dbData.name = data.name;
+    if (data.email !== undefined) dbData.email = data.email;
+    if (data.phone !== undefined) dbData.phone = data.phone;
+    if (data.company !== undefined) dbData.company = data.company;
+    if (data.source !== undefined) dbData.source = data.source;
+    await supabase.from('leads').update(dbData).eq('id', leadId);
     setLeads(prev => prev.map(l => l.id === leadId ? { ...l, ...data, updatedAt: new Date().toISOString() } : l));
   }, []);
 
