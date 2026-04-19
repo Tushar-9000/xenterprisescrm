@@ -12,13 +12,12 @@ import NotificationsPopover from './NotificationsPopover';
 const Sidebar = () => {
   const { user: authUser, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
-  const { getUnreadCount, users } = useCRM();
+  const { users } = useCRM();
   const location = useLocation();
 
   if (!authUser) return null;
 
   const user = users.find(u => u.id === authUser.id) || authUser;
-  const unread = getUnreadCount(user.id);
   const navItems = getNavItems(user.role);
 
   return (
@@ -42,6 +41,9 @@ const Sidebar = () => {
       <nav className="flex-1 px-3 space-y-1">
         {navItems.map((item) => {
           const isActive = location.pathname === item.path;
+          if (item.label === 'Notifications') {
+            return <NotificationsPopover key={item.path} isActive={isActive} />;
+          }
           return (
             <Link
               key={item.path}
@@ -54,11 +56,6 @@ const Sidebar = () => {
             >
               <item.icon className="h-4 w-4" />
               {item.label}
-              {item.label === 'Notifications' && unread > 0 && (
-                <span className="ml-auto bg-primary text-primary-foreground text-xs rounded-full px-2 py-0.5">
-                  {unread}
-                </span>
-              )}
             </Link>
           );
         })}
