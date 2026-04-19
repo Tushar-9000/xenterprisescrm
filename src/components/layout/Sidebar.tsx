@@ -7,6 +7,7 @@ import {
   LayoutDashboard, Users, FolderKanban, Bell, Trophy,
   Settings, LogOut, Phone, UserCircle, Moon, Sun, FileCheck, History
 } from 'lucide-react';
+import NotificationsPopover from './NotificationsPopover';
 
 const Sidebar = () => {
   const { user: authUser, logout } = useAuth();
