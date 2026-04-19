@@ -23,9 +23,12 @@ const Sidebar = () => {
   return (
     <aside className="w-64 min-h-screen bg-sidebar flex flex-col border-r border-sidebar-border">
       <div className="p-6 flex items-center justify-between">
-        <h1 className="text-xl font-bold text-sidebar-foreground">
-          X Enterprise <span className="text-sidebar-primary">CRM</span>
-        </h1>
+        <div className="flex items-center gap-2">
+          <img src="/favicon.png" alt="X Enterprise logo" className="h-7 w-7 rounded-md" />
+          <h1 className="text-xl font-bold text-sidebar-foreground">
+            X Enterprise <span className="text-sidebar-primary">CRM</span>
+          </h1>
+        </div>
         <button
           onClick={toggleTheme}
           className="p-2 rounded-md text-sidebar-foreground hover:bg-sidebar-accent transition-colors"
