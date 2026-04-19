@@ -61,6 +61,7 @@ const Login = () => {
       {/* Left side - Branding */}
       <div className="hidden lg:flex lg:flex-1 flex-col justify-center px-16 bg-background">
         <div className="animate-fade-in max-w-md">
+          <img src="/favicon.png" alt="X Enterprise logo" className="h-14 w-14 rounded-xl mb-5" />
           <h1 className="text-5xl font-extrabold tracking-tight mb-3">
             X Enterprise <span className="text-primary">CRM</span>
           </h1>
@@ -83,7 +84,8 @@ const Login = () => {
       <div className="flex flex-1 items-center justify-center p-8 lg:flex-none lg:w-[480px] bg-login-card">
         <div className="w-full max-w-sm animate-fade-in" style={{ animationDelay: '0.1s' }}>
           {/* Mobile logo */}
-          <div className="lg:hidden text-center mb-6">
+          <div className="lg:hidden flex flex-col items-center mb-6">
+            <img src="/favicon.png" alt="X Enterprise logo" className="h-10 w-10 rounded-lg mb-2" />
             <h1 className="text-2xl font-bold text-login-card-foreground">
               X Enterprise <span className="text-primary">CRM</span>
             </h1>
